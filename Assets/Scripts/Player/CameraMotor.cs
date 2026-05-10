@@ -5,6 +5,7 @@ public class CameraMotor : MonoBehaviour
     [Header("Camera Settings")]
     [SerializeField] private float rotationDuration = 0.1f;
     [SerializeField] private float cameraHeight = 1.7f;
+    [SerializeField] private float fieldOfView = 80;
     
     private Camera playerCamera;
     private Quaternion targetRotation;
@@ -15,11 +16,12 @@ public class CameraMotor : MonoBehaviour
     void Start()
     {
         playerCamera = GetComponent<Camera>();
+        
         if (playerCamera == null)
         {
             playerCamera = gameObject.AddComponent<Camera>();
         }
-        
+        playerCamera.fieldOfView = fieldOfView;
         transform.localPosition = new Vector3(0, cameraHeight, 0);
         targetRotation = transform.rotation;
     }

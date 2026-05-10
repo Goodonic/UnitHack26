@@ -3,6 +3,9 @@
 public class LevelBuilder : MonoBehaviour
 {
     public static LevelBuilder Instance { get; private set; }
+    [Header("Size")]
+    [SerializeField] private float CELL_SIZE = 3f;
+    [SerializeField] private float WALL_HEIGHT = 3f;
     
     [Header("Prefabs")]
     [SerializeField] private GameObject floorPrefab;
@@ -20,8 +23,7 @@ public class LevelBuilder : MonoBehaviour
     [SerializeField] private Color waterColor = Color.blue;
     [SerializeField] private Color wallColor = Color.black;
     
-    private const float CELL_SIZE = 2f;
-    private const float WALL_HEIGHT = 2f;
+    
     
     void Awake()
     {
