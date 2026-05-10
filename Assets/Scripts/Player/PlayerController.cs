@@ -12,6 +12,8 @@ public class PlayerController : MonoBehaviour
     private CameraMotor cameraMotor;
     private bool isMoving = false;
     
+    private PlayerInputActions inputActions;
+    
     void Start()
     {
         gridManager = GridManager.Instance;
@@ -20,32 +22,36 @@ public class PlayerController : MonoBehaviour
         
         FindStartPosition();
         UpdateCameraPosition();
+        
+        // Initialize input system
+        inputActions = new PlayerInputActions();
+        inputActions.Player.Enable();
+        
+        // Subscribe to input events
+        inputActions.Player.MoveForward.performed += ctx => TryMoveForward();
+        inputActions.Player.MoveBackward.performed += ctx => TryMoveBackward();
+        inputActions.Player.RotateLeft.performed += ctx => RotateLeft();
+        inputActions.Player.RotateRight.performed += ctx => RotateRight();
     }
     
-    void Update()
+    void OnDestroy()
     {
-        if (isMoving) return;
-        
-        if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
+        if (inputActions != null)
         {
-            TryMoveForward();
-        }
-        else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
-        {
-            TryMoveBackward();
-        }
-        else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            RotateLeft();
-        }
-        else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            RotateRight();
+            inputActions.Player.MoveForward.performed -= ctx => TryMoveForward();
+            inputActions.Player.MoveBackward.performed -= ctx => TryMoveBackward();
+            inputActions.Player.RotateLeft.performed -= ctx => RotateLeft();
+            inputActions.Player.RotateRight.performed -= ctx => RotateRight();
+            
+            inputActions.Disable();
+            inputActions.Dispose();
         }
     }
     
     private void TryMoveForward()
     {
+        if (isMoving) return;
+        
         Vector2Int targetPosition = currentPosition + currentDirection.ToVector();
         
         if (CanMoveTo(targetPosition))
@@ -56,6 +62,8 @@ public class PlayerController : MonoBehaviour
     
     private void TryMoveBackward()
     {
+        if (isMoving) return;
+        
         Direction opposite = GetOppositeDirection(currentDirection);
         Vector2Int targetPosition = currentPosition + opposite.ToVector();
         
@@ -126,6 +134,8 @@ public class PlayerController : MonoBehaviour
     
     private void RotateLeft()
     {
+        if (isMoving) return;
+        
         currentDirection = currentDirection switch
         {
             Direction.North => Direction.West,
@@ -140,6 +150,8 @@ public class PlayerController : MonoBehaviour
     
     private void RotateRight()
     {
+        if (isMoving) return;
+        
         currentDirection = currentDirection switch
         {
             Direction.North => Direction.East,
@@ -185,7 +197,7 @@ public class PlayerController : MonoBehaviour
         if (currentTile.IsExit)
         {
             Debug.Log("Level Complete!");
-            // TODO Логика завершения уровня
+            // Здесь можно добавить логику завершения уровня
         }
     }
 }
