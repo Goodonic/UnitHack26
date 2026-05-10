@@ -277,8 +277,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelBuilder
   CELL_SIZE: 3
   WALL_HEIGHT: 3
-  floorPrefab: {fileID: 8637278226989754255, guid: 3ad025ddef133524f9511bb33b85a05a, type: 3}
-  wallPrefab: {fileID: 6129034264533135538, guid: 71f7f1a9de49c9241ba7bf9c7332f6f6, type: 3}
+  floorPrefab: {fileID: 7803971899212018742, guid: 3ad025ddef133524f9511bb33b85a05a, type: 3}
+  wallPrefab: {fileID: 4296125577507711886, guid: 71f7f1a9de49c9241ba7bf9c7332f6f6, type: 3}
   stoneMaterial: {fileID: 0}
   dirtMaterial: {fileID: 0}
   waterMaterial: {fileID: 0}
