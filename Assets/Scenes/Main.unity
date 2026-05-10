@@ -283,26 +283,10 @@ MonoBehaviour:
   dirtMaterial: {fileID: 0}
   waterMaterial: {fileID: 0}
   wallMaterial: {fileID: 0}
-  stoneColor:
-    r: 0.5
-    g: 0.5
-    b: 0.5
-    a: 1
-  dirtColor:
-    r: 0.55
-    g: 0.41
-    b: 0.27
-    a: 1
-  waterColor:
-    r: 0
-    g: 0
-    b: 1
-    a: 1
-  wallColor:
-    r: 0.34509805
-    g: 0.34509805
-    b: 0.34509805
-    a: 1
+  stoneColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  dirtColor: {r: 0.55, g: 0.41, b: 0.27, a: 1}
+  waterColor: {r: 0, g: 0, b: 1, a: 1}
+  wallColor: {r: 0.34509805, g: 0.34509805, b: 0.34509805, a: 1}
 --- !u!4 &357430676
 Transform:
   m_ObjectHideFlags: 0
