@@ -8,6 +8,7 @@ public class Tile
     public TileType GroundType;
     public bool IsStart;
     public bool IsExit;
+    public bool HasEnemy;
 
     public Tile(Vector2Int position)
     {
@@ -16,6 +17,7 @@ public class Tile
         GroundType = TileType.Stone;
         IsStart = false;
         IsExit = false;
+        HasEnemy = false; 
     }
 
     public bool HasWall(Direction direction)

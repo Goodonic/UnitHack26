@@ -9,6 +9,7 @@ namespace Generation
         [Header("Generation Settings")]
         [SerializeField] private int height = 21;
         [SerializeField] private int width = 21;
+        [SerializeField] private int enemyCount = 5;
         [SerializeField] private Vector2Int startPosition = new Vector2Int(1, 1);
         
         private GridManager gridManager;
@@ -26,9 +27,42 @@ namespace Generation
             gridManager.InitializeGrid(width, height);
             GenerateMazeRecursiveBacktracker();
             PlaceStartAndExit();
+            PlaceEnemies();
             LevelBuilder.Instance.BuildLevel(gridManager.GetGrid());
         }
-        
+
+        private void PlaceEnemies() //Enemy placement random avaliable tile
+        {
+            List<Tile> candidates = new List<Tile>();
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    Tile tile = gridManager.GetTile(x, y);
+
+                    if (tile == null)
+                        continue;
+                    if (tile.IsStart || tile.IsExit)
+                        continue;
+
+                    candidates.Add(tile);
+                }
+            }
+
+            for (int i = 0; i < enemyCount; i++)
+            {
+                if (candidates.Count == 0)
+                    return;
+
+                int index = Random.Range(0, candidates.Count);
+
+                Tile selected = candidates[index];
+                selected.HasEnemy = true;
+                candidates.RemoveAt(index);
+            }
+        }
+
         private void GenerateMazeRecursiveBacktracker()
         {
             Vector2Int start = startPosition;

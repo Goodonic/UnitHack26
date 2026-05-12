@@ -11,7 +11,8 @@ public class PlayerController : MonoBehaviour
     private LevelBuilder levelBuilder;
     private CameraMotor cameraMotor;
     private bool isMoving = false;
-    
+    private bool inCombat = false;
+
     private PlayerInputActions inputActions;
     
     void Start()
@@ -47,11 +48,16 @@ public class PlayerController : MonoBehaviour
             inputActions.Dispose();
         }
     }
-    
+
+    public void SetCombatState(bool state)
+    {
+        inCombat = state;
+    }
+
     private void TryMoveForward()
     {
-        if (isMoving) return;
-        
+        if (isMoving || inCombat) return;
+
         Vector2Int targetPosition = currentPosition + currentDirection.ToVector();
         
         if (CanMoveTo(targetPosition))
@@ -62,8 +68,8 @@ public class PlayerController : MonoBehaviour
     
     private void TryMoveBackward()
     {
-        if (isMoving) return;
-        
+        if (isMoving || inCombat) return;
+
         Direction opposite = GetOppositeDirection(currentDirection);
         Vector2Int targetPosition = currentPosition + opposite.ToVector();
         
@@ -128,14 +134,15 @@ public class PlayerController : MonoBehaviour
         currentPosition = targetPosition;
         
         CheckForExit();
-        
+        CheckForEnemy();
+
         isMoving = false;
     }
     
     private void RotateLeft()
     {
-        if (isMoving) return;
-        
+        if (isMoving || inCombat) return;
+
         currentDirection = currentDirection switch
         {
             Direction.North => Direction.West,
@@ -150,8 +157,8 @@ public class PlayerController : MonoBehaviour
     
     private void RotateRight()
     {
-        if (isMoving) return;
-        
+        if (isMoving || inCombat) return;
+
         currentDirection = currentDirection switch
         {
             Direction.North => Direction.East,
@@ -178,8 +185,6 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
-        
-        // Если старт не найден, начинаем с центра
         currentPosition = new Vector2Int(gridManager.Width / 2, gridManager.Height / 2);
     }
     
@@ -190,14 +195,28 @@ public class PlayerController : MonoBehaviour
         transform.position = pos;
         cameraMotor.SetRotation(currentDirection);
     }
-    
+
+    private void CheckForEnemy()
+    {
+        if (inCombat) return;
+
+        Tile currentTile = gridManager.GetTile(currentPosition);
+
+        if (currentTile == null) return;
+
+        if (currentTile.HasEnemy)
+        {
+            CombatManager.Instance.StartCombat(currentTile);
+        }
+    }
+
     private void CheckForExit()
     {
         Tile currentTile = gridManager.GetTile(currentPosition);
         if (currentTile.IsExit)
         {
             Debug.Log("Level Complete!");
-            // Здесь можно добавить логику завершения уровня
+            //где?
         }
     }
 }
