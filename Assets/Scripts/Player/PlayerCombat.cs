@@ -26,6 +26,12 @@ public class PlayerCombat : MonoBehaviour
         Debug.Log("Player Block: " + currentBlock);
     }
 
+    public void Heal(int amount)
+    {
+        currentHp = Mathf.Min(currentHp + amount, maxHp);
+        Debug.Log("Player HP: " + currentHp);
+    }
+
     public void ResetBlock()
     {
         currentBlock = 0;

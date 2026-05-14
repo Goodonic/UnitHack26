@@ -12,8 +12,8 @@ public class CombatManager : MonoBehaviour
     public PlayerCombat playerCombat;
 
     [Header("UI")]
-    public GameObject attackButton;
-    public GameObject defendButton;
+    [SerializeField] private GameObject handUI;
+    [SerializeField] private GameObject playZoneUI;
 
     [Header("Combat View")]
     [SerializeField] private float enemyDistance = 0.0f;
@@ -22,6 +22,24 @@ public class CombatManager : MonoBehaviour
 
     private GameObject enemyVisual;
     private EnemyCombat enemy;
+
+    public System.Action<CardInstance> OnCardUsed;
+
+    public TurnState turnState;
+
+    public bool IsPlayerTurn => turnState == TurnState.PlayerTurn;
+
+    public enum TurnState
+    {
+        PlayerTurn,
+        EnemyTurn
+    }
+
+    private void Start()
+    {
+        isCombatActive = false;
+        SetCombatUI(false);
+    }
 
     private void Awake()
     {
@@ -32,14 +50,18 @@ public class CombatManager : MonoBehaviour
         }
 
         Instance = this;
+
+        SetCombatUI(false);
     }
 
-    private void Start()
+    private void SetCombatUI(bool state)
     {
-        attackButton.SetActive(false);
-        defendButton.SetActive(false);
-    }
+        if (handUI != null)
+            handUI.SetActive(state);
 
+        if (playZoneUI != null)
+            playZoneUI.SetActive(state);
+    }
 
     public void StartCombat(Tile enemyTile)
     {
@@ -47,10 +69,11 @@ public class CombatManager : MonoBehaviour
 
         isCombatActive = true;
         player.SetCombatState(true);
-        attackButton.SetActive(true);
-        defendButton.SetActive(true);
+        SetCombatUI(true);
 
         Debug.Log("COMBAT STARTED");
+
+        turnState = TurnState.PlayerTurn;
 
         Vector3 spawnPos = LevelBuilder.Instance.GetCellWorldPosition(enemyTile.Position);
 
@@ -59,7 +82,9 @@ public class CombatManager : MonoBehaviour
         lookDir.Normalize();
 
         enemyVisual = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        enemyVisual.transform.position = spawnPos + lookDir * enemyDistance + Vector3.up * enemyHeightOffset;
+        enemyVisual.transform.position =
+            spawnPos + lookDir * enemyDistance + Vector3.up * enemyHeightOffset;
+
         enemyVisual.transform.localScale = Vector3.one * enemyScale;
 
         Renderer r = enemyVisual.GetComponent<Renderer>();
@@ -67,49 +92,115 @@ public class CombatManager : MonoBehaviour
 
         enemy = enemyVisual.AddComponent<EnemyCombat>();
 
-        Debug.Log("Enemy spawned on tile");
+        Debug.Log("Enemy spawned");
     }
 
-    public void PlayerAttack()
+    public void PlayCard(CardInstance card)
     {
-        if (!isCombatActive) return;
+        if (!isCombatActive || enemy == null) return;
 
-        enemy.TakeDamage(6);
+        if (!IsPlayerTurn)
+        {
+            Debug.Log("Not player turn");
+            return;
+        }
 
-        CheckEnemyDeath();
+        switch (card.data.effectType) //базовые атака/защита не пропадают
+        {
+            case CardEffectType.Attack:
+                enemy.TakeDamage(card.data.value);
 
-        if (isCombatActive)
-            EnemyTurn();
+                if (enemy != null && enemy.IsDead())
+                {
+                    //OnCardUsed?.Invoke(card);
+                    EndCombat(true);
+                    return;
+                }
+
+                //OnCardUsed?.Invoke(card);
+                EndPlayerTurn();
+                break;
+
+            case CardEffectType.Defend:
+                playerCombat.AddBlock(card.data.value);
+
+                //OnCardUsed?.Invoke(card);
+                EndPlayerTurn();
+                break;
+
+            case CardEffectType.Heal:
+                playerCombat.Heal(card.data.value);
+
+                OnCardUsed?.Invoke(card);
+                EndPlayerTurn();
+                break;
+
+            case CardEffectType.Weakness:
+                Debug.Log("Weakness played");
+
+                OnCardUsed?.Invoke(card);
+                EndPlayerTurn();
+                break;
+        }
     }
 
-    public void PlayerDefend()
+    private void HandleCardConsumption(CardInstance card)
     {
-        if (!isCombatActive) return;
-        playerCombat.AddBlock(5);
+        if (card.data.isConsumable)
+        {
+            Debug.Log($"Card consumed: {card.data.cardName}");
+        }
+    }
+
+    private void EndPlayerTurn()
+    {
+        turnState = TurnState.EnemyTurn;
+        Invoke(nameof(StartEnemyTurn), 0.5f);
+    }
+
+    private void StartEnemyTurn()
+    {
         EnemyTurn();
     }
 
     private void EnemyTurn()
     {
+        if (enemy == null) return;
+
         enemy.Attack(playerCombat);
         playerCombat.ResetBlock();
+
+        if (playerCombat.currentHp <= 0)
+        {
+            Debug.Log("PLAYER LOST");
+            EndCombat(false);
+            return;
+        }
+
+        Invoke(nameof(EndEnemyTurn), 0.5f);
     }
 
-    private void CheckEnemyDeath()
+    private void EndEnemyTurn()
+    {
+        turnState = TurnState.PlayerTurn;
+    }
+
+    private bool CheckEnemyDeath()
     {
         if (enemy != null && enemy.IsDead())
         {
             EndCombat(true);
+            return true;
         }
+
+        return false;
     }
 
     public void EndCombat(bool playerWon)
     {
         isCombatActive = false;
-
         player.SetCombatState(false);
-        attackButton.SetActive(false);
-        defendButton.SetActive(false);
+        SetCombatUI(false);
 
         Debug.Log("Combat finished. Player won: " + playerWon);
 
