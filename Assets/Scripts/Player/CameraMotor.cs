@@ -16,11 +16,16 @@ public class CameraMotor : MonoBehaviour
     void Start()
     {
         playerCamera = GetComponent<Camera>();
-        
         if (playerCamera == null)
         {
             playerCamera = gameObject.AddComponent<Camera>();
         }
+        int previewLayer = LayerMask.NameToLayer("ItemPreview");
+        if (previewLayer != -1)
+        {
+            playerCamera.cullingMask &= ~(1 << previewLayer);
+        }
+
         playerCamera.fieldOfView = fieldOfView;
         transform.localPosition = new Vector3(0, cameraHeight, 0);
         targetRotation = transform.rotation;
