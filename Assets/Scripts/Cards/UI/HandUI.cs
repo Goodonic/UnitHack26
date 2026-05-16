@@ -7,29 +7,47 @@ public class HandUI : MonoBehaviour
     public GameObject cardPrefab;
     public Transform handPanel;
 
-    [Header("Test Deck")]
-    public List<CardData> testDeck;
+    [Header("Deck")]
+    public List<CardData> startingDeck;
 
     private List<CardView> handCards = new();
 
-    private void Start()
+    public void ClearHand()
     {
-        CombatManager.Instance.OnCardUsed += RemoveCard;
-        DrawHand();
+        foreach (var card in handCards)
+        {
+            if (card != null)
+                Destroy(card.gameObject);
+        }
+
+        handCards.Clear();
     }
 
     public void DrawHand()
     {
-        foreach (var cardData in testDeck)
+        Debug.Log("DRAW HAND START");
+        Debug.Log("Panel: " + handPanel);
+        Debug.Log("Prefab: " + cardPrefab);
+        Debug.Log("Deck size: " + startingDeck.Count);
+
+        ClearHand();
+
+        foreach (var cardData in startingDeck)
         {
+            if (cardData == null)
+            {
+                Debug.LogError("NULL CARD DATA IN DECK!");
+                continue;
+            }
+
             CardInstance instance = new CardInstance(cardData);
 
             GameObject cardObj = Instantiate(cardPrefab, handPanel);
-            CardView view = cardObj.GetComponent<CardView>();
 
+            CardView view = cardObj.GetComponent<CardView>();
             view.Setup(instance);
 
-            handCards.Add(view); //добавить карту в список колоды
+            handCards.Add(view);
         }
     }
 

@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 
 public class CombatManager : MonoBehaviour
 {
@@ -7,18 +8,29 @@ public class CombatManager : MonoBehaviour
     [Header("State")]
     public bool isCombatActive;
 
+    [Header("Stamina")]
+    [SerializeField] private int maxStamina = 3;
+
     [Header("References")]
     public PlayerController player;
     public PlayerCombat playerCombat;
 
     [Header("UI")]
-    [SerializeField] private GameObject handUI;
+    [SerializeField] private GameObject handUIRoot;
     [SerializeField] private GameObject playZoneUI;
+
+    [Header("Systems")]
+    [SerializeField] private HandUI handUI;
+
+    [Header("UI Stats")]
+    [SerializeField] private TMP_Text staminaText;
 
     [Header("Combat View")]
     [SerializeField] private float enemyDistance = 0.0f;
     [SerializeField] private float enemyHeightOffset = 2.0f;
     [SerializeField] private float enemyScale = 0.6f;
+
+    private int currentStamina;
 
     private GameObject enemyVisual;
     private EnemyCombat enemy;
@@ -39,6 +51,7 @@ public class CombatManager : MonoBehaviour
     {
         isCombatActive = false;
         SetCombatUI(false);
+        UpdateStaminaUI();
     }
 
     private void Awake()
@@ -56,11 +69,17 @@ public class CombatManager : MonoBehaviour
 
     private void SetCombatUI(bool state)
     {
-        if (handUI != null)
-            handUI.SetActive(state);
+        if (handUIRoot != null)
+            handUIRoot.SetActive(state);
 
         if (playZoneUI != null)
             playZoneUI.SetActive(state);
+    }
+
+    private void UpdateStaminaUI()
+    {
+        if (staminaText != null)
+            staminaText.text = $"Stamina: {currentStamina}/{maxStamina}";
     }
 
     public void StartCombat(Tile enemyTile)
@@ -69,11 +88,21 @@ public class CombatManager : MonoBehaviour
 
         isCombatActive = true;
         player.SetCombatState(true);
+
         SetCombatUI(true);
 
-        Debug.Log("COMBAT STARTED");
+        currentStamina = maxStamina;
+        UpdateStaminaUI();
 
         turnState = TurnState.PlayerTurn;
+
+        //пересбор руки каждый бой
+        if (handUI != null)
+        {
+            handUI.DrawHand();
+        }
+
+        Debug.Log("COMBAT STARTED");
 
         Vector3 spawnPos = LevelBuilder.Instance.GetCellWorldPosition(enemyTile.Position);
 
@@ -82,17 +111,16 @@ public class CombatManager : MonoBehaviour
         lookDir.Normalize();
 
         enemyVisual = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        enemyVisual.transform.position =
-            spawnPos + lookDir * enemyDistance + Vector3.up * enemyHeightOffset;
+
+        enemyVisual.tag = "Enemy";
+
+        enemyVisual.transform.position = spawnPos + lookDir * enemyDistance + Vector3.up * enemyHeightOffset;
 
         enemyVisual.transform.localScale = Vector3.one * enemyScale;
 
-        Renderer r = enemyVisual.GetComponent<Renderer>();
-        r.material.color = Color.red;
+        enemyVisual.GetComponent<Renderer>().material.color = Color.red;
 
         enemy = enemyVisual.AddComponent<EnemyCombat>();
-
-        Debug.Log("Enemy spawned");
     }
 
     public void PlayCard(CardInstance card)
@@ -105,42 +133,46 @@ public class CombatManager : MonoBehaviour
             return;
         }
 
-        switch (card.data.effectType) //базовые атака/защита не пропадают
+        if (card.data.cost > currentStamina)
+        {
+            Debug.Log("Not enough stamina");
+            return;
+        }
+
+        currentStamina -= card.data.cost;
+        UpdateStaminaUI();
+
+        switch (card.data.effectType)
         {
             case CardEffectType.Attack:
                 enemy.TakeDamage(card.data.value);
 
                 if (enemy != null && enemy.IsDead())
                 {
-                    //OnCardUsed?.Invoke(card);
+                    OnCardUsed?.Invoke(card);
                     EndCombat(true);
                     return;
                 }
-
-                //OnCardUsed?.Invoke(card);
-                EndPlayerTurn();
                 break;
 
             case CardEffectType.Defend:
                 playerCombat.AddBlock(card.data.value);
-
-                //OnCardUsed?.Invoke(card);
-                EndPlayerTurn();
                 break;
 
             case CardEffectType.Heal:
-                playerCombat.Heal(card.data.value);
-
                 OnCardUsed?.Invoke(card);
-                EndPlayerTurn();
+                playerCombat.Heal(card.data.value);
                 break;
 
             case CardEffectType.Weakness:
-                Debug.Log("Weakness played");
-
                 OnCardUsed?.Invoke(card);
-                EndPlayerTurn();
+                Debug.Log("Weakness played");
                 break;
+        }
+
+        if (currentStamina <= 0)
+        {
+            EndPlayerTurn();
         }
     }
 
@@ -150,6 +182,16 @@ public class CombatManager : MonoBehaviour
         {
             Debug.Log($"Card consumed: {card.data.cardName}");
         }
+    }
+
+    private void StartPlayerTurn()
+    {
+        turnState = TurnState.PlayerTurn;
+        currentStamina = maxStamina;
+
+        UpdateStaminaUI();
+
+        Debug.Log("Player Turn. Stamina: " + currentStamina);
     }
 
     private void EndPlayerTurn()
@@ -182,7 +224,7 @@ public class CombatManager : MonoBehaviour
 
     private void EndEnemyTurn()
     {
-        turnState = TurnState.PlayerTurn;
+        StartPlayerTurn();
     }
 
     private bool CheckEnemyDeath()
@@ -200,9 +242,16 @@ public class CombatManager : MonoBehaviour
     {
         isCombatActive = false;
         player.SetCombatState(false);
+
         SetCombatUI(false);
 
-        Debug.Log("Combat finished. Player won: " + playerWon);
+        currentStamina = 0;
+        UpdateStaminaUI();
+
+        if (handUI != null)
+        {
+            handUI.ClearHand();
+        }
 
         if (enemyVisual != null)
             Destroy(enemyVisual);
