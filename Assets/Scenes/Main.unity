@@ -337,6 +337,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Generation.DangeonGenerator
   width: 35
   height: 35
+  maxFloors: 3
   minLeafSize: 8
   maxLeafSize: 16
   minRoomSize: 4
@@ -415,6 +416,7 @@ GameObject:
   - component: {fileID: 1807903051}
   - component: {fileID: 1807903050}
   - component: {fileID: 1807903049}
+  - component: {fileID: 1807903052}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -465,6 +467,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1807903052
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1807903048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c879548a532944178f92acad33617ebb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerLight
+  lightIntensity: 9.7
+  lightRange: 20
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

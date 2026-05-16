@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
     private LevelBuilder levelBuilder;
     private DangeonGenerator dangeonGenerator;
     private CameraMotor cameraMotor;
+    private PlayerLight playerLight;
     private bool isMoving = false;
     
     private PlayerInputActions inputActions;
@@ -21,6 +22,7 @@ public class PlayerController : MonoBehaviour
         gridManager = GridManager.Instance;
         levelBuilder = LevelBuilder.Instance;
         cameraMotor = GetComponent<CameraMotor>();
+        playerLight = GetComponent<PlayerLight>();
         dangeonGenerator = DangeonGenerator.Instance;
         
         if (dangeonGenerator == null)
@@ -30,6 +32,7 @@ public class PlayerController : MonoBehaviour
         
         FindStartPosition();
         UpdateCameraPosition();
+        
         
         // Initialize input system
         inputActions = new PlayerInputActions();
