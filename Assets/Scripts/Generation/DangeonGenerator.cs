@@ -6,9 +6,17 @@ namespace Generation
 {
     public class DangeonGenerator : MonoBehaviour
     {
+        public static DangeonGenerator Instance { get; private set; }
+
         [Header("Generation Settings")]
         [SerializeField] private int width = 41;
         [SerializeField] private int height = 41;
+
+        [Header("Floors")]
+        [SerializeField] private int maxFloors = 3;
+
+        public int CurrentFloor { get; private set; } = 1;
+        public int MaxFloors => maxFloors;
 
         [Header("BSP Settings")]
         [SerializeField] private int minLeafSize = 8;
@@ -28,6 +36,18 @@ namespace Generation
         private readonly List<BspLeaf> leaves = new List<BspLeaf>();
         private readonly List<Room> rooms = new List<Room>();
         private readonly HashSet<Vector2Int> floorPositions = new HashSet<Vector2Int>();
+
+        private void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
 
         private void Start()
         {
@@ -55,6 +75,21 @@ namespace Generation
             AssignGroundTypes();
 
             LevelBuilder.Instance.BuildLevel(gridManager.GetGrid());
+
+            Debug.Log($"Generated floor {CurrentFloor}/{maxFloors}");
+        }
+
+        public bool TryGoToNextFloor()
+        {
+            if (CurrentFloor >= maxFloors)
+            {
+                Debug.Log("Dungeon complete! All floors finished.");
+                return false;
+            }
+
+            CurrentFloor++;
+            GenerateDungeon();
+            return true;
         }
 
         private void SplitLeaf(BspLeaf leaf)

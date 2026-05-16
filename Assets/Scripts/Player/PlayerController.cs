@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Generation;
 
 public class PlayerController : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class PlayerController : MonoBehaviour
     private Direction currentDirection = Direction.North;
     private GridManager gridManager;
     private LevelBuilder levelBuilder;
+    private DangeonGenerator dangeonGenerator;
     private CameraMotor cameraMotor;
     private bool isMoving = false;
     
@@ -19,6 +21,12 @@ public class PlayerController : MonoBehaviour
         gridManager = GridManager.Instance;
         levelBuilder = LevelBuilder.Instance;
         cameraMotor = GetComponent<CameraMotor>();
+        dangeonGenerator = DangeonGenerator.Instance;
+        
+        if (dangeonGenerator == null)
+        {   
+            dangeonGenerator = FindObjectOfType<DangeonGenerator>();
+        }
         
         FindStartPosition();
         UpdateCameraPosition();
@@ -194,10 +202,28 @@ public class PlayerController : MonoBehaviour
     private void CheckForExit()
     {
         Tile currentTile = gridManager.GetTile(currentPosition);
-        if (currentTile.IsExit)
+        if (!currentTile.IsExit)
         {
-            Debug.Log("Level Complete!");
-            // Здесь можно добавить логику завершения уровня
+            return;
         }
+
+        if (dangeonGenerator == null)
+        {
+            Debug.Log("DangeonGenerator not found.");
+            return;
+        }
+        
+        if (dangeonGenerator.TryGoToNextFloor())
+        {
+            FindStartPosition();
+            UpdateCameraPosition();
+            
+            Debug.Log($"Level {dangeonGenerator.CurrentFloor} completed!");
+        }
+        else
+        {
+            Debug.Log("All floors completed!");
+        }
+        
     }
 }
