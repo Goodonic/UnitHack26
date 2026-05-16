@@ -7,142 +7,410 @@ namespace Generation
     public class DangeonGenerator : MonoBehaviour
     {
         [Header("Generation Settings")]
-        [SerializeField] private int height = 21;
-        [SerializeField] private int width = 21;
-        [SerializeField] private Vector2Int startPosition = new Vector2Int(1, 1);
-        
+        [SerializeField] private int width = 41;
+        [SerializeField] private int height = 41;
+
+        [Header("BSP Settings")]
+        [SerializeField] private int minLeafSize = 8;
+        [SerializeField] private int maxLeafSize = 16;
+        [SerializeField] private int minRoomSize = 4;
+        [SerializeField] private int roomPadding = 1;
+
+        [Header("Cave Rooms")]
+        [SerializeField, Range(0f, 1f)] private float caveRoomChance = 0.35f;
+        [SerializeField, Range(0f, 1f)] private float caveTileRemoveChance = 0.22f;
+
+        [Header("Ground")]
+        [SerializeField, Range(0f, 1f)] private float dirtChance = 0.18f;
+        [SerializeField, Range(0f, 1f)] private float waterChance = 0.05f;
+
         private GridManager gridManager;
-        private Stack<Vector2Int> visitedStack = new Stack<Vector2Int>();
-        private HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
-        
-        void Start()
+        private readonly List<BspLeaf> leaves = new List<BspLeaf>();
+        private readonly List<Room> rooms = new List<Room>();
+        private readonly HashSet<Vector2Int> floorPositions = new HashSet<Vector2Int>();
+
+        private void Start()
         {
             gridManager = GridManager.Instance;
             GenerateDungeon();
         }
-        
+
         public void GenerateDungeon()
         {
             gridManager.InitializeGrid(width, height);
-            GenerateMazeRecursiveBacktracker();
+
+            leaves.Clear();
+            rooms.Clear();
+            floorPositions.Clear();
+
+            BspLeaf root = new BspLeaf(new RectInt(1, 1, width - 2, height - 2));
+            SplitLeaf(root);
+            CollectLeaves(root);
+
+            CreateRooms();
+            ConnectRooms();
+
+            ApplyWalls();
             PlaceStartAndExit();
+            AssignGroundTypes();
+
             LevelBuilder.Instance.BuildLevel(gridManager.GetGrid());
         }
-        
-        private void GenerateMazeRecursiveBacktracker()
+
+        private void SplitLeaf(BspLeaf leaf)
         {
-            Vector2Int start = startPosition;
-            visitedStack.Push(start);
-            visited.Add(start);
-
-            while (visitedStack.Count > 0)
+            if (leaf.Area.width <= maxLeafSize && leaf.Area.height <= maxLeafSize)
             {
-                Vector2Int current = visitedStack.Peek();
-                List<Vector2Int> unvisitedNeighbors = GetUnvisitedNeighbors(current);
+                return;
+            }
 
-                if (unvisitedNeighbors.Count > 0)
+            bool splitHorizontally;
+
+            if (leaf.Area.width > leaf.Area.height && leaf.Area.width / (float)leaf.Area.height >= 1.25f)
+            {
+                splitHorizontally = false;
+            }
+            else if (leaf.Area.height > leaf.Area.width && leaf.Area.height / (float)leaf.Area.width >= 1.25f)
+            {
+                splitHorizontally = true;
+            }
+            else
+            {
+                splitHorizontally = Random.value > 0.5f;
+            }
+
+            int max = splitHorizontally ? leaf.Area.height - minLeafSize : leaf.Area.width - minLeafSize;
+
+            if (max <= minLeafSize)
+            {
+                return;
+            }
+
+            int split = Random.Range(minLeafSize, max + 1);
+
+            if (splitHorizontally)
+            {
+                leaf.Left = new BspLeaf(new RectInt(
+                    leaf.Area.x,
+                    leaf.Area.y,
+                    leaf.Area.width,
+                    split));
+
+                leaf.Right = new BspLeaf(new RectInt(
+                    leaf.Area.x,
+                    leaf.Area.y + split,
+                    leaf.Area.width,
+                    leaf.Area.height - split));
+            }
+            else
+            {
+                leaf.Left = new BspLeaf(new RectInt(
+                    leaf.Area.x,
+                    leaf.Area.y,
+                    split,
+                    leaf.Area.height));
+
+                leaf.Right = new BspLeaf(new RectInt(
+                    leaf.Area.x + split,
+                    leaf.Area.y,
+                    leaf.Area.width - split,
+                    leaf.Area.height));
+            }
+
+            SplitLeaf(leaf.Left);
+            SplitLeaf(leaf.Right);
+        }
+
+        private void CollectLeaves(BspLeaf leaf)
+        {
+            if (leaf == null)
+            {
+                return;
+            }
+
+            if (leaf.IsLeaf)
+            {
+                leaves.Add(leaf);
+                return;
+            }
+
+            CollectLeaves(leaf.Left);
+            CollectLeaves(leaf.Right);
+        }
+
+        private void CreateRooms()
+        {
+            foreach (BspLeaf leaf in leaves)
+            {
+                int availableWidth = leaf.Area.width - roomPadding * 2;
+                int availableHeight = leaf.Area.height - roomPadding * 2;
+
+                if (availableWidth < minRoomSize || availableHeight < minRoomSize)
                 {
-                    Vector2Int next = unvisitedNeighbors[Random.Range(0, unvisitedNeighbors.Count)];
-                    RemoveWallBetween(current, next);
-                    visitedStack.Push(next);
-                    visited.Add(next);
+                    continue;
+                }
+
+                int roomWidth = Random.Range(minRoomSize, availableWidth + 1);
+                int roomHeight = Random.Range(minRoomSize, availableHeight + 1);
+
+                int roomX = Random.Range(
+                    leaf.Area.x + roomPadding,
+                    leaf.Area.xMax - roomPadding - roomWidth + 1);
+
+                int roomY = Random.Range(
+                    leaf.Area.y + roomPadding,
+                    leaf.Area.yMax - roomPadding - roomHeight + 1);
+
+                Room room = new Room(new RectInt(roomX, roomY, roomWidth, roomHeight));
+                rooms.Add(room);
+                leaf.Room = room;
+
+                if (Random.value < caveRoomChance)
+                {
+                    CarveCaveRoom(room);
                 }
                 else
                 {
-                    visitedStack.Pop();
+                    CarveRectRoom(room);
                 }
             }
         }
-        
-        private List<Vector2Int> GetUnvisitedNeighbors(Vector2Int cell)
-        {
-            List<Vector2Int> neighbors = new List<Vector2Int>();
-        
-            foreach (Direction dir in System.Enum.GetValues(typeof(Direction)))
-            {
-                Vector2Int neighborPos = cell + dir.ToVector();
-            
-                if (gridManager.IsValidPosition(neighborPos) && !visited.Contains(neighborPos))
-                {
-                    neighbors.Add(neighborPos);
-                }
-            }
-        
-            return neighbors;
-        }
-        
-        private void RemoveWallBetween(Vector2Int a, Vector2Int b)
-        {
-            Tile tileA = gridManager.GetTile(a);
-            Tile tileB = gridManager.GetTile(b);
-        
-            Vector2Int delta = b - a;
-        
-            if (delta == new Vector2Int(0, 1)) // B is North of A
-            {
-                tileA.WallNorth = false;
-                tileB.WallSouth = false;
-            }
-            else if (delta == new Vector2Int(0, -1)) // B is South of A
-            {
-                tileA.WallSouth = false;
-                tileB.WallNorth = false;
-            }
-            else if (delta == new Vector2Int(1, 0)) // B is East of A
-            {
-                tileA.WallEast = false;
-                tileB.WallWest = false;
-            }
-            else if (delta == new Vector2Int(-1, 0)) // B is West of A
-            {
-                tileA.WallWest = false;
-                tileB.WallEast = false;
-            }
-        }
-        
-        private void PlaceStartAndExit()
-        {
-            List<Tile> tiles = new List<Tile>();
-            for (int x = 0; x < width; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
-                    tiles.Add(gridManager.GetTile(x, y));
-                }
-            }
-            
-            List<Tile> validTiles = tiles.Where(t => 
-                !t.WallNorth || !t.WallSouth || !t.WallEast || !t.WallWest
-            ).ToList();
 
-            if (validTiles.Count >= 2)
+        private void CarveRectRoom(Room room)
+        {
+            for (int x = room.Area.xMin; x < room.Area.xMax; x++)
             {
-                Tile start = validTiles[Random.Range(0, validTiles.Count)];
-                Tile exit = validTiles[Random.Range(0, validTiles.Count)];
-            
-                int attempts = 0;
-                while (exit == start && attempts < 100)
+                for (int y = room.Area.yMin; y < room.Area.yMax; y++)
                 {
-                    exit = validTiles[Random.Range(0, validTiles.Count)];
-                    attempts++;
+                    CarveFloor(new Vector2Int(x, y));
                 }
-            
-                start.IsStart = true;
-                exit.IsExit = true;
-                
-                start.GroundType = TileType.Stone;
-                exit.GroundType = TileType.Stone;
-                
-                foreach (var tile in tiles)
+            }
+        }
+
+        private void CarveCaveRoom(Room room)
+        {
+            Vector2 center = room.Center;
+            float radiusX = Mathf.Max(1f, room.Area.width * 0.5f);
+            float radiusY = Mathf.Max(1f, room.Area.height * 0.5f);
+
+            for (int x = room.Area.xMin; x < room.Area.xMax; x++)
+            {
+                for (int y = room.Area.yMin; y < room.Area.yMax; y++)
                 {
-                    if (!tile.IsStart && !tile.IsExit)
+                    Vector2 position = new Vector2(x + 0.5f, y + 0.5f);
+                    float normalizedDistance =
+                        Mathf.Pow((position.x - center.x) / radiusX, 2f) +
+                        Mathf.Pow((position.y - center.y) / radiusY, 2f);
+
+                    bool insideCaveShape = normalizedDistance <= Random.Range(0.75f, 1.25f);
+                    bool keepTile = Random.value > caveTileRemoveChance;
+
+                    if (insideCaveShape && keepTile)
                     {
-                        float rand = Random.value;
-                        if (rand < 0.7f) tile.GroundType = TileType.Stone;
-                        else if (rand < 0.9f) tile.GroundType = TileType.Dirt;
-                        else tile.GroundType = TileType.Water;
+                        CarveFloor(new Vector2Int(x, y));
                     }
                 }
+            }
+
+            CarveFloor(room.CenterCell);
+        }
+
+        private void ConnectRooms()
+        {
+            if (rooms.Count <= 1)
+            {
+                return;
+            }
+
+            List<Room> orderedRooms = rooms
+                .OrderBy(room => room.CenterCell.x)
+                .ThenBy(room => room.CenterCell.y)
+                .ToList();
+
+            for (int i = 0; i < orderedRooms.Count - 1; i++)
+            {
+                Vector2Int from = orderedRooms[i].CenterCell;
+                Vector2Int to = orderedRooms[i + 1].CenterCell;
+
+                CarveCorridor(from, to);
+            }
+
+            for (int i = 0; i < orderedRooms.Count / 3; i++)
+            {
+                Room a = orderedRooms[Random.Range(0, orderedRooms.Count)];
+                Room b = orderedRooms[Random.Range(0, orderedRooms.Count)];
+
+                if (a != b)
+                {
+                    CarveCorridor(a.CenterCell, b.CenterCell);
+                }
+            }
+        }
+
+        private void CarveCorridor(Vector2Int from, Vector2Int to)
+        {
+            Vector2Int current = from;
+            CarveFloor(current);
+
+            bool horizontalFirst = Random.value > 0.5f;
+
+            if (horizontalFirst)
+            {
+                while (current.x != to.x)
+                {
+                    current.x += current.x < to.x ? 1 : -1;
+                    CarveFloor(current);
+                }
+
+                while (current.y != to.y)
+                {
+                    current.y += current.y < to.y ? 1 : -1;
+                    CarveFloor(current);
+                }
+            }
+            else
+            {
+                while (current.y != to.y)
+                {
+                    current.y += current.y < to.y ? 1 : -1;
+                    CarveFloor(current);
+                }
+
+                while (current.x != to.x)
+                {
+                    current.x += current.x < to.x ? 1 : -1;
+                    CarveFloor(current);
+                }
+            }
+        }
+
+        private void CarveFloor(Vector2Int position)
+        {
+            if (!gridManager.IsValidPosition(position))
+            {
+                return;
+            }
+
+            floorPositions.Add(position);
+        }
+
+        private void ApplyWalls()
+        {
+            foreach (Vector2Int position in floorPositions)
+            {
+                Tile tile = gridManager.GetTile(position);
+
+                tile.WallNorth = !floorPositions.Contains(position + Vector2Int.up);
+                tile.WallSouth = !floorPositions.Contains(position + Vector2Int.down);
+                tile.WallEast = !floorPositions.Contains(position + Vector2Int.right);
+                tile.WallWest = !floorPositions.Contains(position + Vector2Int.left);
+            }
+        }
+
+        private void PlaceStartAndExit()
+        {
+            if (rooms.Count == 0)
+            {
+                return;
+            }
+
+            Room startRoom = rooms[Random.Range(0, rooms.Count)];
+            Vector2Int startPosition = FindNearestFloor(startRoom.CenterCell);
+
+            Room exitRoom = rooms
+                .OrderByDescending(room => Vector2Int.Distance(startPosition, room.CenterCell))
+                .First();
+
+            Vector2Int exitPosition = FindNearestFloor(exitRoom.CenterCell);
+
+            if (exitPosition == startPosition && floorPositions.Count > 1)
+            {
+                exitPosition = floorPositions
+                    .OrderByDescending(position => Vector2Int.Distance(startPosition, position))
+                    .First();
+            }
+
+            Tile startTile = gridManager.GetTile(startPosition);
+            Tile exitTile = gridManager.GetTile(exitPosition);
+
+            startTile.IsStart = true;
+            startTile.GroundType = TileType.Start;
+
+            exitTile.IsExit = true;
+            exitTile.GroundType = TileType.Exit;
+        }
+
+        private Vector2Int FindNearestFloor(Vector2Int preferredPosition)
+        {
+            if (floorPositions.Contains(preferredPosition))
+            {
+                return preferredPosition;
+            }
+
+            return floorPositions
+                .OrderBy(position => Vector2Int.Distance(preferredPosition, position))
+                .First();
+        }
+
+        private void AssignGroundTypes()
+        {
+            foreach (Vector2Int position in floorPositions)
+            {
+                Tile tile = gridManager.GetTile(position);
+
+                if (tile.IsStart || tile.IsExit)
+                {
+                    tile.GroundType = TileType.Stone;
+                    continue;
+                }
+
+                float random = Random.value;
+
+                if (random < waterChance)
+                {
+                    tile.GroundType = TileType.Water;
+                }
+                else if (random < waterChance + dirtChance)
+                {
+                    tile.GroundType = TileType.Dirt;
+                }
+                else
+                {
+                    tile.GroundType = TileType.Stone;
+                }
+            }
+        }
+
+        private sealed class BspLeaf
+        {
+            public readonly RectInt Area;
+            public BspLeaf Left;
+            public BspLeaf Right;
+            public Room Room;
+
+            public bool IsLeaf => Left == null && Right == null;
+
+            public BspLeaf(RectInt area)
+            {
+                Area = area;
+            }
+        }
+
+        private sealed class Room
+        {
+            public readonly RectInt Area;
+
+            public Vector2 Center => new Vector2(
+                Area.x + Area.width * 0.5f,
+                Area.y + Area.height * 0.5f);
+
+            public Vector2Int CenterCell => new Vector2Int(
+                Area.x + Area.width / 2,
+                Area.y + Area.height / 2);
+
+            public Room(RectInt area)
+            {
+                Area = area;
             }
         }
     }
