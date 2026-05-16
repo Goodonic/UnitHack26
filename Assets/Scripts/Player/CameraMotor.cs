@@ -22,7 +22,6 @@ public class CameraMotor : MonoBehaviour
             playerCamera = gameObject.AddComponent<Camera>();
         }
         playerCamera.fieldOfView = fieldOfView;
-        transform.localPosition = new Vector3(0, cameraHeight, 0);
         targetRotation = transform.rotation;
     }
     
