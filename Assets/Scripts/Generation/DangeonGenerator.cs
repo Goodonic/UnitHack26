@@ -12,6 +12,9 @@ namespace Generation
         [SerializeField] private int enemyCount = 5;
         [SerializeField] private Vector2Int startPosition = new Vector2Int(1, 1);
 
+        [Header("Enemies")]
+        [SerializeField] private List<EnemyData> possibleEnemies;
+
         [Header("BSP Settings")]
         [SerializeField] private int minLeafSize = 8;
         [SerializeField] private int maxLeafSize = 16;
@@ -62,6 +65,12 @@ namespace Generation
 
         private void PlaceEnemies()
         {
+            if (possibleEnemies == null || possibleEnemies.Count == 0)
+            {
+                Debug.LogWarning("DangeonGenerator: Список possibleEnemies пуст! Враги не будут созданы.");
+                return;
+            }
+
             List<Tile> candidates = new List<Tile>();
 
             for (int x = 0; x < width; x++)
@@ -70,11 +79,8 @@ namespace Generation
                 {
                     Tile tile = gridManager.GetTile(x, y);
 
-                    if (tile == null)
-                        continue;
-
-                    if (tile.IsStart || tile.IsExit)
-                        continue;
+                    if (tile == null) continue;
+                    if (tile.IsStart || tile.IsExit) continue;
 
                     candidates.Add(tile);
                 }
@@ -82,13 +88,14 @@ namespace Generation
 
             for (int i = 0; i < enemyCount; i++)
             {
-                if (candidates.Count == 0)
-                    return;
+                if (candidates.Count == 0) return;
 
                 int index = Random.Range(0, candidates.Count);
-
                 Tile selected = candidates[index];
-                selected.HasEnemy = true;
+
+                // ВЫБИРАЕМ СЛУЧАЙНОГО ВРАГА ИЗ СПИСКА И КЛАДЕМ В ТАЙЛ
+                EnemyData randomEnemy = possibleEnemies[Random.Range(0, possibleEnemies.Count)];
+                selected.EnemyDataOnTile = randomEnemy;
 
                 candidates.RemoveAt(index);
             }

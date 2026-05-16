@@ -430,6 +430,9 @@ MonoBehaviour:
   height: 30
   enemyCount: 15
   startPosition: {x: 5, y: 1}
+  possibleEnemies:
+  - {fileID: 11400000, guid: 72d92af6d84a2084e9bbd2106c22b0c2, type: 2}
+  - {fileID: 11400000, guid: b15934bb640b82649b54a5b3da3b086c, type: 2}
   minLeafSize: 8
   maxLeafSize: 16
   minRoomSize: 4
