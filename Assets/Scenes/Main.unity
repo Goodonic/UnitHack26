@@ -449,7 +449,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04314b7b8ac4409abd9e88e8dee42863, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraMotor
-  rotationDuration: 0.1
+  rotationDuration: 0.25
   cameraHeight: 1.7
   fieldOfView: 80
 --- !u!4 &1807903051
