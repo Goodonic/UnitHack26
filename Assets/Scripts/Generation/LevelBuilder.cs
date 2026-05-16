@@ -15,6 +15,8 @@ public class LevelBuilder : MonoBehaviour
     [SerializeField] private Material stoneMaterial;
     [SerializeField] private Material dirtMaterial;
     [SerializeField] private Material waterMaterial;
+    [SerializeField] private Material exitMaterial;
+    [SerializeField] private Material startMaterial;
     [SerializeField] private Material wallMaterial;
     
     [Header("Colors (fallback)")]
@@ -22,6 +24,8 @@ public class LevelBuilder : MonoBehaviour
     [SerializeField] private Color dirtColor = new Color(0.55f, 0.41f, 0.27f);
     [SerializeField] private Color waterColor = Color.blue;
     [SerializeField] private Color wallColor = Color.black;
+    [SerializeField] private Color exitColor = Color.green;
+    [SerializeField] private Color startColor = Color.yellow;
     
     
     
@@ -78,6 +82,14 @@ public class LevelBuilder : MonoBehaviour
                 case TileType.Water:
                     if (waterMaterial != null) renderer.material = waterMaterial;
                     else renderer.material.color = waterColor;
+                    break;
+                case TileType.Exit:
+                    if (waterMaterial != null) renderer.material = exitMaterial;
+                    else renderer.material.color = exitColor;
+                    break;
+                case TileType.Start:
+                    if (waterMaterial != null) renderer.material = startMaterial;
+                    else renderer.material.color = startColor;
                     break;
             }
         }

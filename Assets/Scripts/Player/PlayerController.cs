@@ -170,10 +170,11 @@ public class PlayerController : MonoBehaviour
         
         cameraMotor.RotateRight();
     }
-    
+
     private void FindStartPosition()
     {
         Tile[,] grid = gridManager.GetGrid();
+
         for (int x = 0; x < gridManager.Width; x++)
         {
             for (int y = 0; y < gridManager.Height; y++)
@@ -185,9 +186,11 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
+
+        // Если старт не найден — центр карты
         currentPosition = new Vector2Int(gridManager.Width / 2, gridManager.Height / 2);
     }
-    
+
     private void UpdateCameraPosition()
     {
         Vector3 pos = levelBuilder.GetCellWorldPosition(currentPosition);
