@@ -152,9 +152,9 @@ MonoBehaviour:
   WALL_HEIGHT: 3
   floorPrefab: {fileID: 7803971899212018742, guid: 3ad025ddef133524f9511bb33b85a05a, type: 3}
   wallPrefab: {fileID: 4296125577507711886, guid: 71f7f1a9de49c9241ba7bf9c7332f6f6, type: 3}
-  stoneMaterial: {fileID: 2100000, guid: cd181378a53810f41b6eb1c18c6a67cc, type: 2}
-  dirtMaterial: {fileID: 2100000, guid: cd181378a53810f41b6eb1c18c6a67cc, type: 2}
-  waterMaterial: {fileID: 2100000, guid: cd181378a53810f41b6eb1c18c6a67cc, type: 2}
+  stoneMaterial: {fileID: 2100000, guid: 373802d3079aba84ebf65b775d4b9a4b, type: 2}
+  dirtMaterial: {fileID: 2100000, guid: 373802d3079aba84ebf65b775d4b9a4b, type: 2}
+  waterMaterial: {fileID: 2100000, guid: 373802d3079aba84ebf65b775d4b9a4b, type: 2}
   exitMaterial: {fileID: 0}
   startMaterial: {fileID: 0}
   wallMaterial: {fileID: 0}
@@ -591,8 +591,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c879548a532944178f92acad33617ebb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerLight
-  lightIntensity: 346
-  lightRange: 19
+  lightIntensity: 189
+  lightRange: 9
 --- !u!1 &1971090181
 GameObject:
   m_ObjectHideFlags: 0

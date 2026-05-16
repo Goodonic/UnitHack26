@@ -3,8 +3,8 @@
 public class PlayerLight : MonoBehaviour
 {
     [Header("Light Settings")]
-    [SerializeField] private float lightIntensity = 9.7f;
-    [SerializeField] private float lightRange = 20f;
+    [SerializeField] private float lightIntensity = 189f;
+    [SerializeField] private float lightRange = 9f;
     
 
     private Light playerLightComponent;
@@ -22,7 +22,7 @@ public class PlayerLight : MonoBehaviour
 
         playerLightComponent.shadows = LightShadows.Soft;
         playerLightComponent.bounceIntensity = 0;
-        playerLightComponent.color = new Color(0.921568632f, 0.717647076f, 0.13333334f);
+        playerLightComponent.color = new Color(255,0,255, 255);
         playerLightComponent.intensity = lightIntensity;
         playerLightComponent.range = lightRange;
 
