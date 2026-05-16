@@ -12,6 +12,8 @@ public class CameraMotor : MonoBehaviour
     private bool isRotating = false;
     private float rotationProgress = 0f;
     private Quaternion startRotation;
+
+    public bool IsRotating => isRotating;
     
     void Start()
     {
@@ -21,6 +23,7 @@ public class CameraMotor : MonoBehaviour
         {
             playerCamera = gameObject.AddComponent<Camera>();
         }
+
         playerCamera.fieldOfView = fieldOfView;
         targetRotation = transform.rotation;
     }
@@ -42,12 +45,24 @@ public class CameraMotor : MonoBehaviour
     
     public void RotateLeft()
     {
-        StartRotation(transform.eulerAngles.y - 90);
+        if (isRotating)
+        {
+            return;
+        }
+
+        float currentTargetYaw = targetRotation.eulerAngles.y;
+        StartRotation(currentTargetYaw - 90f);
     }
     
     public void RotateRight()
     {
-        StartRotation(transform.eulerAngles.y + 90);
+        if (isRotating)
+        {
+            return;
+        }
+
+        float currentTargetYaw = targetRotation.eulerAngles.y;
+        StartRotation(currentTargetYaw + 90f);
     }
     
     private void StartRotation(float targetYaw)

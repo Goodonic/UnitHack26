@@ -27,7 +27,7 @@ namespace Generation
         [Header("Cave Rooms")]
         [SerializeField, Range(0f, 1f)] private float caveRoomChance = 0.35f;
         [SerializeField, Range(0f, 1f)] private float caveTileRemoveChance = 0.22f;
-
+        
         [Header("Ground")]
         [SerializeField, Range(0f, 1f)] private float dirtChance = 0.18f;
         [SerializeField, Range(0f, 1f)] private float waterChance = 0.05f;
@@ -69,7 +69,7 @@ namespace Generation
 
             CreateRooms();
             ConnectRooms();
-
+            
             ApplyWalls();
             PlaceStartAndExit();
             AssignGroundTypes();

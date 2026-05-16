@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviour
         gridManager = GridManager.Instance;
         levelBuilder = LevelBuilder.Instance;
         cameraMotor = GetComponent<CameraMotor>();
-        playerLight = GetComponent<PlayerLight>();
+        playerLight = GetComponentInChildren<PlayerLight>();
         dangeonGenerator = DangeonGenerator.Instance;
         
         if (dangeonGenerator == null)
@@ -61,7 +61,7 @@ public class PlayerController : MonoBehaviour
     
     private void TryMoveForward()
     {
-        if (isMoving) return;
+        if (isMoving || cameraMotor.IsRotating) return;
         
         Vector2Int targetPosition = currentPosition + currentDirection.ToVector();
         
@@ -73,7 +73,7 @@ public class PlayerController : MonoBehaviour
     
     private void TryMoveBackward()
     {
-        if (isMoving) return;
+        if (isMoving || cameraMotor.IsRotating) return;
         
         Direction opposite = GetOppositeDirection(currentDirection);
         Vector2Int targetPosition = currentPosition + opposite.ToVector();
@@ -145,7 +145,7 @@ public class PlayerController : MonoBehaviour
     
     private void RotateLeft()
     {
-        if (isMoving) return;
+        if (isMoving || cameraMotor.IsRotating) return;
         
         currentDirection = currentDirection switch
         {
@@ -161,7 +161,7 @@ public class PlayerController : MonoBehaviour
     
     private void RotateRight()
     {
-        if (isMoving) return;
+        if (isMoving || cameraMotor.IsRotating) return;
         
         currentDirection = currentDirection switch
         {
