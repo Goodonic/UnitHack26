@@ -358,12 +358,18 @@ namespace Generation
             {
                 Tile tile = gridManager.GetTile(position);
 
-                if (tile.IsStart || tile.IsExit)
+                if (tile.IsStart)
                 {
-                    tile.GroundType = TileType.Stone;
+                    tile.GroundType = TileType.Start;
                     continue;
                 }
-
+                
+                if (tile.IsExit)
+                {
+                    tile.GroundType = TileType.Exit;
+                    continue;
+                }
+                
                 float random = Random.value;
 
                 if (random < waterChance)

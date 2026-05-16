@@ -282,11 +282,15 @@ MonoBehaviour:
   stoneMaterial: {fileID: 0}
   dirtMaterial: {fileID: 0}
   waterMaterial: {fileID: 0}
+  exitMaterial: {fileID: 0}
+  startMaterial: {fileID: 0}
   wallMaterial: {fileID: 0}
   stoneColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   dirtColor: {r: 0.55, g: 0.41, b: 0.27, a: 1}
   waterColor: {r: 0, g: 0, b: 1, a: 1}
   wallColor: {r: 0.34509805, g: 0.34509805, b: 0.34509805, a: 1}
+  exitColor: {r: 0, g: 1, b: 0, a: 1}
+  startColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!4 &357430676
 Transform:
   m_ObjectHideFlags: 0
@@ -331,10 +335,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a46b57ab1c8471e867ba9f73558c1e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Generation.DangeonGenerator
-  height: 10
-  width: 10
-  startPosition: {x: 5, y: 1}
-  gridManager: {fileID: 0}
+  width: 35
+  height: 35
+  minLeafSize: 8
+  maxLeafSize: 16
+  minRoomSize: 4
+  roomPadding: 1
+  caveRoomChance: 0.35
+  caveTileRemoveChance: 0.22
+  dirtChance: 0.18
+  waterChance: 0.05
 --- !u!4 &496603484
 Transform:
   m_ObjectHideFlags: 0
@@ -379,8 +389,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 178f91190b684350be31530de86f3645, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GridManager
-  <Width>k__BackingField: 0
-  <Height>k__BackingField: 0
 --- !u!4 &1616673347
 Transform:
   m_ObjectHideFlags: 0
@@ -427,12 +435,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   moveDelay: 0.3
-  currentPosition: {x: 0, y: 0}
-  currentDirection: 0
-  gridManager: {fileID: 0}
-  levelBuilder: {fileID: 0}
-  cameraMotor: {fileID: 0}
-  isMoving: 0
 --- !u!114 &1807903050
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -448,11 +450,6 @@ MonoBehaviour:
   rotationDuration: 0.1
   cameraHeight: 1.7
   fieldOfView: 80
-  playerCamera: {fileID: 0}
-  targetRotation: {x: 0, y: 0, z: 0, w: 0}
-  isRotating: 0
-  rotationProgress: 0
-  startRotation: {x: 0, y: 0, z: 0, w: 0}
 --- !u!4 &1807903051
 Transform:
   m_ObjectHideFlags: 0

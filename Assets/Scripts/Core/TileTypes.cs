@@ -2,5 +2,7 @@ public enum TileType
 {
     Dirt,
     Stone,
-    Water
+    Water,
+    Exit,
+    Start
 }

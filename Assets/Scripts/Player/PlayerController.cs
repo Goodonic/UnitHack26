@@ -179,8 +179,8 @@ public class PlayerController : MonoBehaviour
             }
         }
         
-        // Если старт не найден, начинаем с центра
-        currentPosition = new Vector2Int(gridManager.Width / 2, gridManager.Height / 2);
+        // // Если старт не найден, начинаем с центра
+        // currentPosition = new Vector2Int(gridManager.Width / 2, gridManager.Height / 2);
     }
     
     private void UpdateCameraPosition()
