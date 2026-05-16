@@ -4,7 +4,7 @@ using UnityEngine;
 public class EnemyStats
 {
     public string enemyName = "Enemy";
-    public int maxHP = 20;
+    public int maxHP = 30;
     public int currentHP = 20;
     public int attackPower = 3;
 
