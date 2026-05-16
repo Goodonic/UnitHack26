@@ -200,7 +200,7 @@ public class CombatManager : MonoBehaviour
     {
         if (currentEnemy == null) return;
 
-        currentEnemy.ResetBlock();
+        currentEnemy.StartTurn();
 
         currentEnemy.PerformRandomAction(playerCombat);
 
