@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Generation;
+using UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,7 +11,7 @@ public class PlayerController : MonoBehaviour
     private Direction currentDirection = Direction.North;
     private GridManager gridManager;
     private LevelBuilder levelBuilder;
-    private DangeonGenerator dangeonGenerator;
+    private DungeonGenerator dungeonGenerator;
     private CameraMotor cameraMotor;
     private PlayerLight playerLight;
     private bool isMoving = false;
@@ -23,11 +24,11 @@ public class PlayerController : MonoBehaviour
         levelBuilder = LevelBuilder.Instance;
         cameraMotor = GetComponent<CameraMotor>();
         playerLight = GetComponentInChildren<PlayerLight>();
-        dangeonGenerator = DangeonGenerator.Instance;
+        dungeonGenerator = DungeonGenerator.Instance;
         
-        if (dangeonGenerator == null)
+        if (dungeonGenerator == null)
         {   
-            dangeonGenerator = FindObjectOfType<DangeonGenerator>();
+            dungeonGenerator = FindObjectOfType<DungeonGenerator>();
         }
         
         FindStartPosition();
@@ -137,6 +138,11 @@ public class PlayerController : MonoBehaviour
         
         transform.position = targetPos;
         currentPosition = targetPosition;
+
+        if (MinimapRenderer.Instance != null)
+        {
+            MinimapRenderer.Instance.SetPlayerPosition(currentPosition);
+        }
         
         CheckForExit();
         
@@ -200,6 +206,11 @@ public class PlayerController : MonoBehaviour
         pos.y = 1.7f;
         transform.position = pos;
         cameraMotor.SetRotation(currentDirection);
+
+        if (MinimapRenderer.Instance != null)
+        {
+            MinimapRenderer.Instance.SetPlayerPosition(currentPosition);
+        }
     }
     
     private void CheckForExit()
@@ -210,18 +221,18 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        if (dangeonGenerator == null)
+        if (dungeonGenerator == null)
         {
             Debug.Log("DangeonGenerator not found.");
             return;
         }
         
-        if (dangeonGenerator.TryGoToNextFloor())
+        if (dungeonGenerator.TryGoToNextFloor())
         {
             FindStartPosition();
             UpdateCameraPosition();
             
-            Debug.Log($"Level {dangeonGenerator.CurrentFloor} completed!");
+            Debug.Log($"Level {dungeonGenerator.CurrentFloor} completed!");
         }
         else
         {

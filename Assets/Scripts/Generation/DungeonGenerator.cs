@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UI;
 
 namespace Generation
 {
-    public class DangeonGenerator : MonoBehaviour
+    public class DungeonGenerator : MonoBehaviour
     {
-        public static DangeonGenerator Instance { get; private set; }
+        public static DungeonGenerator Instance { get; private set; }
 
         [Header("Generation Settings")]
         [SerializeField] private int width = 41;
@@ -75,6 +76,11 @@ namespace Generation
             AssignGroundTypes();
 
             LevelBuilder.Instance.BuildLevel(gridManager.GetGrid());
+
+            if (MinimapRenderer.Instance != null)
+            {
+                MinimapRenderer.Instance.DrawMap(gridManager.GetGrid());
+            }
 
             Debug.Log($"Generated floor {CurrentFloor}/{maxFloors}");
         }
