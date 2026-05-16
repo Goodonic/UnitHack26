@@ -3,35 +3,31 @@ using UnityEngine.EventSystems;
 
 public class InventorySlotUI : MonoBehaviour, IDropHandler
 {
-    public int x, y;
-
+    [Tooltip("Порядковый номер этой ячейки в инвентаре (от 0 до 149)")]
+    public int slotIndex;
     public void OnDrop(PointerEventData eventData)
     {
-        InventoryItemUI draggedItem = eventData.pointerDrag?.GetComponent<InventoryItemUI>();
-        InventoryGrid grid = Object.FindAnyObjectByType<InventoryGrid>();
+        Debug.Log($"На ячейку {slotIndex} что-то бросили!");
 
-        if (draggedItem != null && grid != null)
+        InventoryItemUI draggedItem = eventData.pointerDrag.GetComponent<InventoryItemUI>();
+        if (draggedItem != null)
         {
-            grid.RemoveItem(draggedItem.itemData);
+            int fromIndex = draggedItem.originalSlotIndex;
+            int toIndex = this.slotIndex;
 
-            if (grid.CanPlaceItem(draggedItem.itemData, this.x, this.y))
+            // ИЗМЕНЕНИЕ ЗДЕСЬ: Ищем InventoryUI во всей сцене, а не только у родителей
+            InventoryUI inventoryUI = FindAnyObjectByType<InventoryUI>();
+
+            if (inventoryUI != null)
             {
-                grid.PlaceItem(draggedItem.itemData, this.x, this.y);
-
-                InventoryDisplay display = Object.FindAnyObjectByType<InventoryDisplay>();
-
-                if (display != null)
-                {
-                    draggedItem.SetPosition(this.x, this.y, display.cellSize, display.spacing);
-                }
-                else
-                {
-                    draggedItem.SetPosition(this.x, this.y, 64f, 0f);
-                }
+                // Если менеджер найден, запускаем обмен и обновляем визуал
+                inventoryUI.inventoryLogic.SwapSlots(fromIndex, toIndex);
+                inventoryUI.RefreshAll();
             }
             else
             {
-                Debug.Log("Места нет!");
+                // Добавил ошибку на всякий случай, чтобы мы точно знали, если он опять потеряется
+                Debug.LogError("Скрипт InventoryUI не найден на сцене!");
             }
         }
     }

@@ -1,84 +1,68 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using UnityEngine.EventSystems;
 
-public class InventoryItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler
+public class InventoryItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    public ItemData itemData;
-    private RectTransform rectTransform;
+    [Header("Ссылки на компоненты")]
+    public Image itemIcon;
+    public TextMeshProUGUI amountText;
+
+    [HideInInspector] public int originalSlotIndex;
+
+    private Canvas canvas;
     private CanvasGroup canvasGroup;
+    private RectTransform rectTransform;
     private Transform originalParent;
-
-    private Vector2 lastAnchoredPosition;
-    private float currentCellSize;
-
-    private Vector2 dragOffset;
-
     private void Awake()
     {
+        canvas = GetComponentInParent<Canvas>();
+        canvasGroup = GetComponent<CanvasGroup>();
+        if (canvasGroup == null) canvasGroup = gameObject.AddComponent<CanvasGroup>();
         rectTransform = GetComponent<RectTransform>();
-        canvasGroup = gameObject.AddComponent<CanvasGroup>();
     }
-
-    public void SetItem(ItemData data, float cellSize, float spacing = 0f)
+    public void Refresh(InventorySlot slot)
     {
-        itemData = data;
-        currentCellSize = cellSize;
-        GetComponent<Image>().sprite = data.icon;
-
-        float totalWidth = data.width * cellSize + (data.width - 1) * spacing;
-        float totalHeight = data.height * cellSize + (data.height - 1) * spacing;
-
-        rectTransform.sizeDelta = new Vector2(totalWidth, totalHeight);
-    }
-
-    public void SetPosition(int x, int y, float cellSize, float spacing = 0f)
-    {
-        float step = cellSize + spacing;
-
-        rectTransform.anchoredPosition = new Vector2(x * step, -y * step);
-        lastAnchoredPosition = rectTransform.anchoredPosition;
+        if (slot == null || slot.IsEmpty)
+        {
+            gameObject.SetActive(false);
+            return;
+        }
+        gameObject.SetActive(true);
+        itemIcon.sprite = slot.itemData.icon;
+        amountText.text = slot.amount > 1 ? slot.amount.ToString() : "";
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
         originalParent = transform.parent;
 
-        dragOffset = (Vector2)rectTransform.position - eventData.position;
+        originalSlotIndex = originalParent.GetComponent<InventorySlotUI>().slotIndex;
 
-        transform.SetParent(transform.root);
+        transform.SetParent(canvas.transform);
+
         canvasGroup.blocksRaycasts = false;
-        canvasGroup.alpha = 0.7f;
+        canvasGroup.alpha = 0.6f;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        rectTransform.position = eventData.position + dragOffset;
+        // Двигаем иконку за мышкой
+        rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
         canvasGroup.blocksRaycasts = true;
         canvasGroup.alpha = 1f;
+
+        // Возвращаем предмет в иерархию ячейки
         transform.SetParent(originalParent);
+        rectTransform.anchoredPosition = Vector2.zero;
 
-        rectTransform.anchoredPosition = lastAnchoredPosition;
-    }
-
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        if (eventData.button == PointerEventData.InputButton.Left)
-        {
-            // Вызываем нашу новую панель и передаем ей данные предмета
-            if (ItemInfoPanel.Instance != null)
-            {
-                ItemInfoPanel.Instance.ShowInfo(itemData);
-            }
-        }
-        // Твой старый код для правой кнопки (контекстное меню)
-        else if (eventData.button == PointerEventData.InputButton.Right)
-        {
-            ContextMenu.Instance.Show(itemData, eventData.position);
-        }
+        // ДОБАВЬ ЭТУ СТРОКУ:
+        // Обновляем визуал всего инвентаря ПОСЛЕ того, как объект вернулся на место
+        FindAnyObjectByType<InventoryUI>().RefreshAll();
     }
 }
