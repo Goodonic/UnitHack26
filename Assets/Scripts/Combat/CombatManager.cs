@@ -93,6 +93,12 @@ public class CombatManager : MonoBehaviour
         UpdateStaminaUI();
         turnState = TurnState.PlayerTurn;
 
+        if (EquipmentManager.Instance != null)
+        {
+            playerCombat.maxHp = 50 + EquipmentManager.Instance.bonusMaxHp;
+            playerCombat.Heal(0);
+        }
+
         if (handUI != null)
         {
             handUI.DrawHand();
@@ -136,7 +142,10 @@ public class CombatManager : MonoBehaviour
         switch (card.data.effectType)
         {
             case CardEffectType.Attack:
-                currentEnemy.TakeDamage(card.data.value);
+                int finalDamage = card.data.value + (EquipmentManager.Instance != null ? EquipmentManager.Instance.bonusAttack : 0);
+
+                currentEnemy.TakeDamage(finalDamage);
+                Debug.Log($"Разыграна Атака! Базовый урон: {card.data.value} + Бонус экипировки: {(EquipmentManager.Instance != null ? EquipmentManager.Instance.bonusAttack : 0)} = Итоговый урон: {finalDamage}");
 
                 if (currentEnemy != null && currentEnemy.IsDead)
                 {
@@ -147,7 +156,10 @@ public class CombatManager : MonoBehaviour
                 break;
 
             case CardEffectType.Defend:
-                playerCombat.AddBlock(card.data.value);
+                int finalBlock = card.data.value + (EquipmentManager.Instance != null ? EquipmentManager.Instance.bonusDefense : 0);
+
+                playerCombat.AddBlock(finalBlock);
+                Debug.Log($"Разыграна Защита! Базовый блок: {card.data.value} + Бонус экипировки: {(EquipmentManager.Instance != null ? EquipmentManager.Instance.bonusDefense : 0)} = Итоговый блок: {finalBlock}");
                 break;
 
             case CardEffectType.Heal:

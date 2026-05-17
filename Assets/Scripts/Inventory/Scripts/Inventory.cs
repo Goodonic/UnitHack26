@@ -5,9 +5,13 @@ public class Inventory : MonoBehaviour
 {
     [Header("Настройки инвентаря")]
     public int columns = 5;
-    public int rows = 30;
+    public int rows = 28;
 
-    public int TotalSlots => columns * rows;
+    [Header("Настройки экипировки")]
+    public int equipmentSlotsCount = 6;
+
+    public int TotalInventorySlots => columns * rows;
+    public int TotalSlots => TotalInventorySlots + equipmentSlotsCount;
 
     [Header("Содержимое")]
     public InventorySlot[] slots;
@@ -16,6 +20,7 @@ public class Inventory : MonoBehaviour
     {
         InitializeInventory();
     }
+
     private void InitializeInventory()
     {
         slots = new InventorySlot[TotalSlots];
@@ -24,77 +29,139 @@ public class Inventory : MonoBehaviour
             slots[i] = new InventorySlot();
         }
     }
-    public void SwapSlots(int index1, int index2)
+
+    // Проверка: является ли этот индекс ячейкой экипировки?
+    public bool IsEquipmentSlot(int index)
     {
-        Debug.Log($"Логика: Меняем местами ячейки {index1} и {index2}");
-        if (index1 < 0 || index1 >= TotalSlots || index2 < 0 || index2 >= TotalSlots)
-            return;
-        if (index1 == index2) return;
+        return index >= TotalInventorySlots && index < TotalSlots;
+    }
 
-        InventorySlot slot1 = slots[index1];
-        InventorySlot slot2 = slots[index2];
+    public void SwapSlots(int fromIndex, int toIndex)
+    {
+        if (fromIndex < 0 || fromIndex >= TotalSlots || toIndex < 0 || toIndex >= TotalSlots) return;
+        if (fromIndex == toIndex) return;
 
-        if (!slot1.IsEmpty && !slot2.IsEmpty &&
-        slot1.itemData.id == slot2.itemData.id && slot1.itemData.isStackable)
+        InventorySlot fromSlot = slots[fromIndex];
+        InventorySlot toSlot = slots[toIndex];
+
+        bool fromIsEquip = IsEquipmentSlot(fromIndex);
+        bool toIsEquip = IsEquipmentSlot(toIndex);
+
+        // 1. Снимаем эффекты перед перемещением
+        if (fromIsEquip && !fromSlot.IsEmpty) EquipmentManager.Instance.Unequip(fromSlot.itemData);
+        if (toIsEquip && !toSlot.IsEmpty) EquipmentManager.Instance.Unequip(toSlot.itemData);
+
+        // 2. Логика: Тянем СТАК из инвентаря в экипировку (отделяем 1 предмет)
+        if (!fromIsEquip && toIsEquip && fromSlot.amount > 1)
         {
-            int spaceLeft = slot2.itemData.maxStackSize - slot2.amount;
-
-            if (spaceLeft > 0)
+            if (toSlot.IsEmpty)
             {
-                int amountToMove = Mathf.Min(slot1.amount, spaceLeft);
-                slot2.amount += amountToMove;
-                slot1.amount -= amountToMove;
+                toSlot.itemData = fromSlot.itemData;
+                toSlot.amount = 1;
+                fromSlot.amount -= 1;
 
-                if (slot1.amount <= 0) slot1.Clear();
+                EquipmentManager.Instance.Equip(toSlot.itemData);
+                return;
+            }
+            else if (fromSlot.itemData.id != toSlot.itemData.id)
+            {
+                // Если в слоте экипировки лежит другой предмет, пробуем вернуть его в инвентарь
+                InventorySlot emptyInInventory = FindEmptyInventorySlot();
+                if (emptyInInventory != null)
+                {
+                    emptyInInventory.itemData = toSlot.itemData;
+                    emptyInInventory.amount = toSlot.amount;
 
+                    toSlot.itemData = fromSlot.itemData;
+                    toSlot.amount = 1;
+                    fromSlot.amount -= 1;
+
+                    EquipmentManager.Instance.Equip(toSlot.itemData);
+                    return;
+                }
+                else
+                {
+                    // Нет места в инвентаре для обмена шмотки — отмена
+                    EquipmentManager.Instance.Equip(toSlot.itemData);
+                    return;
+                }
+            }
+            else
+            {
+                // Пытаемся положить тот же предмет в слот экипировки, где он уже есть — отмена
+                EquipmentManager.Instance.Equip(toSlot.itemData);
                 return;
             }
         }
 
+        // 3. Логика: Возвращаем предмет из экипировки в инвентарь на СТАК такого же предмета
+        if (fromIsEquip && !toIsEquip && !fromSlot.IsEmpty && !toSlot.IsEmpty)
+        {
+            if (fromSlot.itemData.id == toSlot.itemData.id && toSlot.itemData.isStackable)
+            {
+                int spaceLeft = toSlot.itemData.maxStackSize - toSlot.amount;
+                if (spaceLeft >= fromSlot.amount)
+                {
+                    toSlot.amount += fromSlot.amount;
+                    fromSlot.Clear();
+                    // Слот очищен, бафф уже снят в шаге 1. Всё ок.
+                    return;
+                }
+            }
+        }
+
+        // 4. Обычный полноценный обмен (работает и для перетаскивания НАЗАД из экипировки в пустой/занятый слот)
         InventorySlot temp = new InventorySlot();
-        temp.itemData = slot1.itemData;
-        temp.amount = slot1.amount;
+        temp.itemData = fromSlot.itemData;
+        temp.amount = fromSlot.amount;
 
-        slot1.itemData = slot2.itemData;
-        slot1.amount = slot2.amount;
+        fromSlot.itemData = toSlot.itemData;
+        fromSlot.amount = toSlot.amount;
 
-        slot2.itemData = temp.itemData;
-        slot2.amount = temp.amount;
+        toSlot.itemData = temp.itemData;
+        toSlot.amount = temp.amount;
+
+        // 5. Применяем эффекты к тем предметам, которые оказались в слотах экипировки после обмена
+        if (fromIsEquip && !fromSlot.IsEmpty) EquipmentManager.Instance.Equip(fromSlot.itemData);
+        if (toIsEquip && !toSlot.IsEmpty) EquipmentManager.Instance.Equip(toSlot.itemData);
     }
+
     public bool AddItem(ItemData itemData, int amount)
     {
         if (itemData.isStackable)
         {
-            foreach(var slot in slots)
+            for (int i = 0; i < TotalInventorySlots; i++)
             {
-                if(!slot.IsEmpty && slot.itemData.id == itemData.id && slot.amount < itemData.maxStackSize)
+                InventorySlot slot = slots[i];
+                if (!slot.IsEmpty && slot.itemData.id == itemData.id && slot.amount < itemData.maxStackSize)
                 {
                     int addedAmount = Mathf.Min(amount, itemData.maxStackSize - slot.amount);
                     slot.amount += addedAmount;
                     amount -= addedAmount;
 
-                    if(amount <= 0) return true;
+                    if (amount <= 0) return true;
                 }
             }
         }
+
         while (amount > 0)
         {
-            InventorySlot emptySlot = FindEmptySlot();
-            if(emptySlot ==  null) return false;
+            InventorySlot emptySlot = FindEmptyInventorySlot();
+            if (emptySlot == null) return false;
 
             emptySlot.itemData = itemData;
             int add = Mathf.Min(amount, itemData.maxStackSize);
             emptySlot.amount = add;
             amount -= add;
-
         }
         return true;
     }
-    private InventorySlot FindEmptySlot()
+
+    private InventorySlot FindEmptyInventorySlot()
     {
-        foreach (var slot in slots)
+        for (int i = 0; i < TotalInventorySlots; i++)
         {
-            if (slot.IsEmpty) return slot;
+            if (slots[i].IsEmpty) return slots[i];
         }
         return null;
     }

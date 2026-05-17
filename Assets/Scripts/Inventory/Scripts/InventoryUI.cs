@@ -7,7 +7,13 @@ public class InventoryUI : MonoBehaviour
     [Header("Ссылки на логику и объекты")]
     public Inventory inventoryLogic;
     public GameObject inventoryWindow;
+
+    [Header("Панели UI")]
+    [Tooltip("Панель для обычных ячеек (0-149)")]
     public Transform contentPanel;
+    [Tooltip("Панель для ячеек экипировки (150-155)")]
+    public Transform equipmentPanel;
+
     public ScrollRect scrollRect;
 
     [Header("Префабы")]
@@ -16,6 +22,7 @@ public class InventoryUI : MonoBehaviour
 
     public ItemData testItem;
     public int testAmount = 5;
+
     private void Start()
     {
         InitializeUI();
@@ -26,6 +33,7 @@ public class InventoryUI : MonoBehaviour
         RefreshAll();
         inventoryWindow.SetActive(false);
     }
+
     private void Update()
     {
         if (Keyboard.current != null && Keyboard.current.tabKey.wasPressedThisFrame)
@@ -42,6 +50,7 @@ public class InventoryUI : MonoBehaviour
             }
         }
     }
+
     private void InitializeUI()
     {
         int totalSlots = inventoryLogic.TotalSlots;
@@ -49,17 +58,19 @@ public class InventoryUI : MonoBehaviour
 
         for (int i = 0; i < totalSlots; i++)
         {
-            InventorySlotUI newSlotUI = Instantiate(slotPrefab, contentPanel);
+            Transform targetPanel = inventoryLogic.IsEquipmentSlot(i) ? equipmentPanel : contentPanel;
+
+            InventorySlotUI newSlotUI = Instantiate(slotPrefab, targetPanel);
             newSlotUI.slotIndex = i;
             uiSlots[i] = newSlotUI;
         }
     }
+
     public void RefreshAll()
     {
         for (int i = 0; i < inventoryLogic.TotalSlots; i++)
         {
             InventorySlot logicSlot = inventoryLogic.slots[i];
-
             InventorySlotUI uiSlot = uiSlots[i];
 
             InventoryItemUI itemUI = uiSlot.GetComponentInChildren<InventoryItemUI>(true);
