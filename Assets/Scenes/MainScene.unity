@@ -741,10 +741,11 @@ MonoBehaviour:
   height: 30
   enemyCount: 40
   startPosition: {x: 5, y: 1}
-  maxFloors: 3
+  maxFloors: 1
   possibleEnemies:
   - {fileID: 11400000, guid: 72d92af6d84a2084e9bbd2106c22b0c2, type: 2}
   - {fileID: 11400000, guid: b15934bb640b82649b54a5b3da3b086c, type: 2}
+  bossEnemy: {fileID: 11400000, guid: 5f52cb66b265a344fbd63f6125335d85, type: 2}
   minLeafSize: 8
   maxLeafSize: 16
   minRoomSize: 4
