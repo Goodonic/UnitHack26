@@ -49,4 +49,4 @@ MonoBehaviour:
   - item: {fileID: 11400000, guid: 3bcf487cc2c793247abab5db57522d30, type: 2}
     dropChance: 41.4
   - item: {fileID: 11400000, guid: 4193b5eed5c03764d86c503445c81d69, type: 2}
-    dropChance: 19.1
+    dropChance: 9.5

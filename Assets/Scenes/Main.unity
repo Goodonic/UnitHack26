@@ -9024,8 +9024,8 @@ MonoBehaviour:
   equipmentPanel: {fileID: 1302346621}
   scrollRect: {fileID: 387133256}
   slotPrefab: {fileID: 3672545278319643036, guid: ece67e1e7c634034da41b0e1598ef0dc, type: 3}
-  testItem: {fileID: 11400000, guid: 4193b5eed5c03764d86c503445c81d69, type: 2}
-  testAmount: 50
+  testItem: {fileID: 11400000, guid: b9204a5ad0212d14ca68b11ac068ec1f, type: 2}
+  testAmount: 1
 --- !u!114 &1807903054
 MonoBehaviour:
   m_ObjectHideFlags: 0

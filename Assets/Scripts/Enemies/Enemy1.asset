@@ -44,7 +44,9 @@ MonoBehaviour:
   minDrops: 1
   maxDrops: 4
   lootTable:
-  - item: {fileID: 11400000, guid: 4193b5eed5c03764d86c503445c81d69, type: 2}
+  - item: {fileID: 11400000, guid: dc1571f7e30e12c4f983f4b0be07b014, type: 2}
     dropChance: 85.9
   - item: {fileID: 11400000, guid: b9204a5ad0212d14ca68b11ac068ec1f, type: 2}
     dropChance: 40
+  - item: {fileID: 11400000, guid: 4193b5eed5c03764d86c503445c81d69, type: 2}
+    dropChance: 8.6
