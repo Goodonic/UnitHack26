@@ -20,8 +20,12 @@ MonoBehaviour:
     type: 0
     value: 40
     priority: 10
+    cooldownTurns: 0
+    maxUsesPerCombat: 0
   - actionName: "\u0412\u0410\u0419 \u0411\u042F\u041B\u042F"
     type: 0
     value: 10
     priority: 70
-  visualPrefab: {fileID: 8285041180570305516, guid: 48f24fd822df0344c869beadbdb609d5, type: 3}
+    cooldownTurns: 0
+    maxUsesPerCombat: 0
+  visualPrefab: {fileID: 1706797945679324546, guid: 5bc108a646e47e642aaacf21ae9fb543, type: 3}

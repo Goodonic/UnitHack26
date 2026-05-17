@@ -81,6 +81,7 @@ namespace Generation
             PlaceStartAndExit();
 
             PlaceEnemies();
+            MinimapRenderer.Instance?.DrawMap(gridManager.GetGrid());
             LevelBuilder.Instance.BuildLevel(gridManager.GetGrid());
         }
 
