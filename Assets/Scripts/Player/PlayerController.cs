@@ -15,9 +15,10 @@ public class PlayerController : MonoBehaviour
     private CameraMotor cameraMotor;
     private PlayerLight playerLight;
     private bool isMoving = false;
-    
+    private bool inCombat = false;
+
     private PlayerInputActions inputActions;
-    
+
     void Start()
     {
         gridManager = GridManager.Instance;
@@ -65,32 +66,37 @@ public class PlayerController : MonoBehaviour
             inputActions.Dispose();
         }
     }
-    
+
+    public void SetCombatState(bool state)
+    {
+        inCombat = state;
+    }
+
     private void TryMoveForward()
     {
-        if (isMoving || cameraMotor.IsRotating) return;
-        
+        if (isMoving || inCombat || cameraMotor.IsRotating) return;
+
         Vector2Int targetPosition = currentPosition + currentDirection.ToVector();
-        
+
         if (CanMoveTo(targetPosition))
         {
             StartCoroutine(MoveToPosition(targetPosition));
         }
     }
-    
+
     private void TryMoveBackward()
     {
-        if (isMoving || cameraMotor.IsRotating) return;
-        
+        if (isMoving || inCombat || cameraMotor.IsRotating) return;
+
         Direction opposite = GetOppositeDirection(currentDirection);
         Vector2Int targetPosition = currentPosition + opposite.ToVector();
-        
+
         if (CanMoveTo(targetPosition))
         {
             StartCoroutine(MoveToPosition(targetPosition));
         }
     }
-    
+
     private bool CanMoveTo(Vector2Int targetPosition)
     {
         if (!gridManager.IsValidPosition(targetPosition))
@@ -151,14 +157,15 @@ public class PlayerController : MonoBehaviour
         }
         
         CheckForExit();
-        
+        CheckForEnemy();
+
         isMoving = false;
     }
-    
+
     private void RotateLeft()
     {
-        if (isMoving || cameraMotor.IsRotating) return;
-        
+        if (isMoving || inCombat || cameraMotor.IsRotating) return;
+
         currentDirection = currentDirection switch
         {
             Direction.North => Direction.West,
@@ -167,14 +174,14 @@ public class PlayerController : MonoBehaviour
             Direction.East => Direction.North,
             _ => currentDirection
         };
-        
+
         cameraMotor.RotateLeft();
     }
-    
+
     private void RotateRight()
     {
-        if (isMoving || cameraMotor.IsRotating) return;
-        
+        if (isMoving || inCombat || cameraMotor.IsRotating) return;
+
         currentDirection = currentDirection switch
         {
             Direction.North => Direction.East,
@@ -183,13 +190,14 @@ public class PlayerController : MonoBehaviour
             Direction.West => Direction.North,
             _ => currentDirection
         };
-        
+
         cameraMotor.RotateRight();
     }
-    
+
     private void FindStartPosition()
     {
         Tile[,] grid = gridManager.GetGrid();
+
         for (int x = 0; x < gridManager.Width; x++)
         {
             for (int y = 0; y < gridManager.Height; y++)
@@ -201,8 +209,11 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
+
+        // Если старт не найден — центр карты
+        currentPosition = new Vector2Int(gridManager.Width / 2, gridManager.Height / 2);
     }
-    
+
     private void UpdateCameraPosition()
     {
         Vector3 pos = levelBuilder.GetCellWorldPosition(currentPosition);
@@ -215,10 +226,25 @@ public class PlayerController : MonoBehaviour
             MinimapRenderer.Instance.SetPlayerPosition(currentPosition);
         }
     }
-    
+
+    private void CheckForEnemy()
+    {
+        if (inCombat) return;
+
+        Tile currentTile = gridManager.GetTile(currentPosition);
+
+        if (currentTile == null) return;
+
+        if (currentTile.HasEnemy)
+        {
+            CombatManager.Instance.StartCombat(currentTile, currentTile.EnemyDataOnTile);
+        }
+    }
+
     private void CheckForExit()
     {
         Tile currentTile = gridManager.GetTile(currentPosition);
+
         if (!currentTile.IsExit)
         {
             return;
@@ -226,21 +252,20 @@ public class PlayerController : MonoBehaviour
 
         if (dungeonGenerator == null)
         {
-            Debug.Log("DangeonGenerator not found.");
+            Debug.Log("Dungeon generator not found.");
             return;
         }
-        
+
         if (dungeonGenerator.TryGoToNextFloor())
         {
             FindStartPosition();
             UpdateCameraPosition();
-            
+
             Debug.Log($"Level {dungeonGenerator.CurrentFloor} completed!");
         }
         else
         {
             Debug.Log("All floors completed!");
         }
-        
     }
 }

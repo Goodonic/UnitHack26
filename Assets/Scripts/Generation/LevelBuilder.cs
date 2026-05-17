@@ -101,6 +101,10 @@ public class LevelBuilder : MonoBehaviour
                     break;
             }
         }
+        if (tile.HasEnemy)
+        {
+            renderer.material.color = Color.red;
+        }
     }
     
     private void BuildWalls(Tile tile, Vector3 position, Transform parent)

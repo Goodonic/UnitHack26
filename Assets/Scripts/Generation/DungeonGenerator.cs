@@ -12,12 +12,17 @@ namespace Generation
         [Header("Generation Settings")]
         [SerializeField] private int width = 41;
         [SerializeField] private int height = 41;
+        [SerializeField] private int enemyCount = 5;
+        [SerializeField] private Vector2Int startPosition = new Vector2Int(1, 1);
 
         [Header("Floors")]
         [SerializeField] private int maxFloors = 3;
 
         public int CurrentFloor { get; private set; } = 1;
         public int MaxFloors => maxFloors;
+
+        [Header("Enemies")]
+        [SerializeField] private List<EnemyData> possibleEnemies;
 
         [Header("BSP Settings")]
         [SerializeField] private int minLeafSize = 8;
@@ -32,6 +37,7 @@ namespace Generation
         [Header("Ground")]
         [SerializeField, Range(0f, 1f)] private float dirtChance = 0.18f;
         [SerializeField, Range(0f, 1f)] private float waterChance = 0.05f;
+
 
         private GridManager gridManager;
         private readonly List<BspLeaf> leaves = new List<BspLeaf>();
@@ -73,6 +79,52 @@ namespace Generation
             
             ApplyWalls();
             PlaceStartAndExit();
+
+            PlaceEnemies();
+            MinimapRenderer.Instance?.DrawMap(gridManager.GetGrid());
+            LevelBuilder.Instance.BuildLevel(gridManager.GetGrid());
+        }
+
+        private void PlaceEnemies()
+        {
+            if (possibleEnemies == null || possibleEnemies.Count == 0)
+            {
+                Debug.LogWarning("DangeonGenerator: Список possibleEnemies пуст! Враги не будут созданы.");
+                return;
+            }
+
+            List<Tile> candidates = new List<Tile>();
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    Tile tile = gridManager.GetTile(x, y);
+
+                    if (tile == null) continue;
+                    if (tile.IsStart || tile.IsExit) continue;
+
+                    candidates.Add(tile);
+                }
+            }
+
+            for (int i = 0; i < enemyCount; i++)
+            {
+                if (candidates.Count == 0) return;
+
+                int index = Random.Range(0, candidates.Count);
+                Tile selected = candidates[index];
+
+                // ВЫБИРАЕМ СЛУЧАЙНОГО ВРАГА ИЗ СПИСКА И КЛАДЕМ В ТАЙЛ
+                EnemyData randomEnemy = possibleEnemies[Random.Range(0, possibleEnemies.Count)];
+                selected.EnemyDataOnTile = randomEnemy;
+
+                candidates.RemoveAt(index);
+            }
+        }
+
+        private void GenerateMazeRecursiveBacktracker()
+        {
             AssignGroundTypes();
 
             LevelBuilder.Instance.BuildLevel(gridManager.GetGrid());
@@ -97,7 +149,7 @@ namespace Generation
             GenerateDungeon();
             return true;
         }
-
+           
         private void SplitLeaf(BspLeaf leaf)
         {
             if (leaf.Area.width <= maxLeafSize && leaf.Area.height <= maxLeafSize)

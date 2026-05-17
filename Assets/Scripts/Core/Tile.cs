@@ -6,8 +6,13 @@ public class Tile
     public Vector2Int Position;
     public bool WallNorth, WallSouth, WallEast, WallWest;
     public TileType GroundType;
+
     public bool IsStart;
     public bool IsExit;
+
+    public EnemyData EnemyDataOnTile;
+
+    public bool HasEnemy => EnemyDataOnTile != null;
 
     public Tile(Vector2Int position)
     {
@@ -16,6 +21,7 @@ public class Tile
         GroundType = TileType.Stone;
         IsStart = false;
         IsExit = false;
+        EnemyDataOnTile = null;
     }
 
     public bool HasWall(Direction direction)

@@ -150,8 +150,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelBuilder
   CELL_SIZE: 3
   WALL_HEIGHT: 3
+<<<<<<< HEAD
   floorPrefab: {fileID: 7803971899212018742, guid: 3ad025ddef133524f9511bb33b85a05a, type: 3}
   wallPrefab: {fileID: 4296125577507711886, guid: 71f7f1a9de49c9241ba7bf9c7332f6f6, type: 3}
+=======
+  floorPrefab: {fileID: 7803971899212018742, guid: 968f8848a5757e84da36bc1a97531bce, type: 3}
+  wallPrefab: {fileID: 4296125577507711886, guid: 6dfa440af5d18744c9a0debaf2f59f08, type: 3}
+>>>>>>> deck
   stoneMaterial: {fileID: 2100000, guid: 373802d3079aba84ebf65b775d4b9a4b, type: 2}
   dirtMaterial: {fileID: 2100000, guid: 373802d3079aba84ebf65b775d4b9a4b, type: 2}
   waterMaterial: {fileID: 2100000, guid: 373802d3079aba84ebf65b775d4b9a4b, type: 2}
@@ -210,7 +215,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Generation.DangeonGenerator
   width: 35
   height: 35
+<<<<<<< HEAD
   maxFloors: 3
+=======
+  enemyCount: 35
+  startPosition: {x: 1, y: 1}
+  maxFloors: 3
+  possibleEnemies: []
+>>>>>>> deck
   minLeafSize: 8
   maxLeafSize: 16
   minRoomSize: 4
@@ -407,8 +419,12 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
+<<<<<<< HEAD
   m_Children:
   - {fileID: 1971090182}
+=======
+  m_Children: []
+>>>>>>> deck
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -416,6 +432,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+<<<<<<< HEAD
 --- !u!1001 &1535705514
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -473,6 +490,8 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ca084a5dbeaf98f41aef20582159e5fb, type: 3}
+=======
+>>>>>>> deck
 --- !u!1 &1616673345
 GameObject:
   m_ObjectHideFlags: 0
@@ -593,8 +612,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c879548a532944178f92acad33617ebb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerLight
+<<<<<<< HEAD
   lightIntensity: 189
   lightRange: 9
+=======
+>>>>>>> deck
 --- !u!82 &1807903053
 AudioSource:
   m_ObjectHideFlags: 0
@@ -700,6 +722,7 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1807903048}
   m_Enabled: 1
+<<<<<<< HEAD
 --- !u!1 &1971090181
 GameObject:
   m_ObjectHideFlags: 0
@@ -794,6 +817,8 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1971090181}
   m_CullTransparentMesh: 1
+=======
+>>>>>>> deck
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -804,4 +829,7 @@ SceneRoots:
   - {fileID: 1807903051}
   - {fileID: 915067385}
   - {fileID: 891858717}
+<<<<<<< HEAD
   - {fileID: 1535705514}
+=======
+>>>>>>> deck
