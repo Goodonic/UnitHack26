@@ -8,6 +8,7 @@ public class Tile
     public TileType GroundType;
 
     public bool HasChest { get; set; }
+    public Chest ChestOnTile { get; set; }
 
     public bool IsStart;
     public bool IsExit;

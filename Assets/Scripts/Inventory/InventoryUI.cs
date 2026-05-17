@@ -62,6 +62,10 @@ public class InventoryUI : MonoBehaviour
 
             InventorySlotUI newSlotUI = Instantiate(slotPrefab, targetPanel);
             newSlotUI.slotIndex = i;
+
+            newSlotUI.associatedInventory = inventoryLogic;
+            newSlotUI.ownerUI = this;
+
             uiSlots[i] = newSlotUI;
         }
     }

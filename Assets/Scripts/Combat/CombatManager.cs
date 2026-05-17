@@ -37,6 +37,8 @@ public class CombatManager : MonoBehaviour
     [SerializeField] private float enemyHeightOffset = 2.0f;
     [SerializeField] private float enemyScale = 0.6f;
 
+    [SerializeField] private VictoryUI victoryUI;
+
     private int currentStamina;
 
     private Enemy currentEnemy;
@@ -268,6 +270,15 @@ public class CombatManager : MonoBehaviour
             Debug.Log("ПОБЕДА! Враг повержен.");
 
             currentEnemyTile.EnemyDataOnTile = null;
+
+            if (victoryUI != null)
+            {
+                victoryUI.ShowVictoryScreen();
+            }
+            else
+            {
+                Debug.LogError("VictoryUI не назначен в CombatManager!");
+            }
 
             List<ItemData> generatedLoot = currentEnemyData.GenerateLoot();
 

@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   enemyID: 2
   enemyName: Predat
+  visualPrefab: {fileID: 1706797945679324546, guid: 5bc108a646e47e642aaacf21ae9fb543, type: 3}
   maxHp: 10
   possibleActions:
   - actionName: "\u042F\u0425\u0410\u0419 \u0411\u041B\u042F"
@@ -28,4 +29,10 @@ MonoBehaviour:
     priority: 70
     cooldownTurns: 0
     maxUsesPerCombat: 0
-  visualPrefab: {fileID: 1706797945679324546, guid: 5bc108a646e47e642aaacf21ae9fb543, type: 3}
+  minDrops: 1
+  maxDrops: 4
+  lootTable:
+  - item: {fileID: 11400000, guid: 4193b5eed5c03764d86c503445c81d69, type: 2}
+    dropChance: 100
+  - item: {fileID: 11400000, guid: 4193b5eed5c03764d86c503445c81d69, type: 2}
+    dropChance: 100

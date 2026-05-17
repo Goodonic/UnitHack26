@@ -37,9 +37,7 @@ public class InventoryItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     public void OnBeginDrag(PointerEventData eventData)
     {
         originalParent = transform.parent;
-
         originalSlotIndex = originalParent.GetComponent<InventorySlotUI>().slotIndex;
-
         transform.SetParent(canvas.transform);
 
         canvasGroup.blocksRaycasts = false;
@@ -48,7 +46,6 @@ public class InventoryItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     public void OnDrag(PointerEventData eventData)
     {
-        // Двигаем иконку за мышкой
         rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
     }
 
@@ -60,6 +57,42 @@ public class InventoryItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         transform.SetParent(originalParent);
         rectTransform.anchoredPosition = Vector2.zero;
 
-        FindAnyObjectByType<InventoryUI>().RefreshAll();
+        GameObject targetGO = eventData.pointerCurrentRaycast.gameObject;
+
+        if (targetGO != null)
+        {
+            InventorySlotUI targetSlotUI = targetGO.GetComponent<InventorySlotUI>();
+            if (targetSlotUI == null) targetSlotUI = targetGO.GetComponentInParent<InventorySlotUI>();
+
+            InventorySlotUI sourceSlotUI = originalParent.GetComponent<InventorySlotUI>();
+
+            if (targetSlotUI != null && sourceSlotUI != null)
+            {
+                if (sourceSlotUI.associatedInventory == targetSlotUI.associatedInventory)
+                {
+                    sourceSlotUI.associatedInventory.SwapSlots(sourceSlotUI.slotIndex, targetSlotUI.slotIndex);
+                }
+                else
+                {
+                    sourceSlotUI.associatedInventory.MoveItemToOtherInventory(
+                        sourceSlotUI.slotIndex,
+                        targetSlotUI.associatedInventory,
+                        targetSlotUI.slotIndex
+                    );
+                }
+                if (sourceSlotUI.ownerUI != null) sourceSlotUI.ownerUI.RefreshAll();
+                else if (sourceSlotUI.ownerChestUI != null) sourceSlotUI.ownerChestUI.RefreshChest();
+
+                if (targetSlotUI.ownerUI != null) targetSlotUI.ownerUI.RefreshAll();
+                else if (targetSlotUI.ownerChestUI != null) targetSlotUI.ownerChestUI.RefreshChest();
+                return; 
+            }
+        }
+
+        InventorySlotUI fallbackSlotUI = originalParent.GetComponent<InventorySlotUI>();
+        if (fallbackSlotUI != null && fallbackSlotUI.ownerUI != null)
+        {
+            fallbackSlotUI.ownerUI.RefreshAll();
+        }
     }
 }

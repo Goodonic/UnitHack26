@@ -17,6 +17,7 @@ public class Chest : MonoBehaviour
         if (myTile != null)
         {
             myTile.HasChest = true;
+            myTile.ChestOnTile = this;
         }
 
         if (chestInventory == null) chestInventory = GetComponent<Inventory>();
@@ -45,6 +46,7 @@ public class Chest : MonoBehaviour
         {
             myTile.HasChest = false;
             myTile.EnemyDataOnTile = null;
+            myTile.ChestOnTile = null;
         }
 
         Debug.Log("Сундук и зона врага уничтожены.");

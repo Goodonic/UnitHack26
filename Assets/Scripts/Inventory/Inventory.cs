@@ -174,4 +174,76 @@ public class Inventory : MonoBehaviour
         }
         return null;
     }
+
+    public void MoveItemToOtherInventory(int sourceIndex, Inventory targetInventory, int targetIndex)
+    {
+        if (sourceIndex < 0 || sourceIndex >= slots.Length) return;
+        if (targetInventory == null) return;
+        if (targetIndex < 0 || targetIndex >= targetInventory.slots.Length) return;
+
+        InventorySlot fromSlot = slots[sourceIndex];
+        InventorySlot toSlot = targetInventory.slots[targetIndex];
+
+        if (fromSlot == null || fromSlot.IsEmpty) return;
+
+        bool fromIsEquip = IsEquipmentSlot(sourceIndex);
+        bool toIsEquip = targetInventory.IsEquipmentSlot(targetIndex);
+
+        // 1. УМНОЕ ОБЪЕДИНЕНИЕ (СТАКИНГ) МЕЖДУ РАЗНЫМИ ИНВЕНТАРЯМИ
+        if (toSlot != null && !toSlot.IsEmpty && fromSlot.itemData == toSlot.itemData)
+        {
+            if (fromSlot.itemData.isStackable && !toIsEquip)
+            {
+                int maxStack = fromSlot.itemData.maxStackSize;
+
+                if (toSlot.amount < maxStack)
+                {
+                    int spaceLeft = maxStack - toSlot.amount;
+                    int amountToMove = Mathf.Min(fromSlot.amount, spaceLeft);
+
+                    toSlot.amount += amountToMove;
+                    fromSlot.amount -= amountToMove;
+
+                    if (fromSlot.amount <= 0)
+                    {
+                        if (fromIsEquip && EquipmentManager.Instance != null)
+                            EquipmentManager.Instance.Unequip(fromSlot.itemData);
+
+                        fromSlot.itemData = null;
+                        fromSlot.amount = 0;
+                    }
+                    return;
+                }
+            }
+        }
+
+        // 2. ОГРАНИЧЕНИЯ ДЛЯ СЛОТОВ ЭКИПИРОВКИ В ЦЕЛЕВОМ ИНВЕНТАРЕ
+        if (toIsEquip && fromSlot.amount > 1)
+        {
+            Debug.LogWarning("Нельзя переместить стак предметов сразу в слот экипировки!");
+            return;
+        }
+
+        // 3. ПОЛНЫЙ ПЕРЕНОС ИЛИ СВАП ПРЕДМЕТОВ МЕЖДУ РАЗНЫМИ ИНВЕНТАРЯМИ
+        if (fromIsEquip && EquipmentManager.Instance != null)
+            EquipmentManager.Instance.Unequip(fromSlot.itemData);
+
+        if (toIsEquip && !toSlot.IsEmpty && EquipmentManager.Instance != null)
+            EquipmentManager.Instance.Unequip(toSlot.itemData);
+
+        ItemData tempItem = fromSlot.itemData;
+        int tempAmount = fromSlot.amount;
+
+        fromSlot.itemData = toSlot.itemData;
+        fromSlot.amount = toSlot.amount;
+
+        toSlot.itemData = tempItem;
+        toSlot.amount = tempAmount;
+
+        if (fromIsEquip && !fromSlot.IsEmpty && EquipmentManager.Instance != null)
+            EquipmentManager.Instance.Equip(fromSlot.itemData);
+
+        if (toIsEquip && !toSlot.IsEmpty && EquipmentManager.Instance != null)
+            EquipmentManager.Instance.Equip(toSlot.itemData);
+    }
 }

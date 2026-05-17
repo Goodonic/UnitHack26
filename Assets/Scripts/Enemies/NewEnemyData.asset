@@ -14,18 +14,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   enemyID: 1
   enemyName: Cube
+  visualPrefab: {fileID: 8285041180570305516, guid: 48f24fd822df0344c869beadbdb609d5, type: 3}
   maxHp: 20
   possibleActions:
   - actionName: "\u041C\u0435\u0433\u0430\u0411\u043E\u043D\u043A"
     type: 0
     value: 2
     priority: 50
+    cooldownTurns: 0
+    maxUsesPerCombat: 0
   - actionName: "\u041C\u0435\u0433\u0430\u0421\u0443\u043F\u0435\u0440\u0411\u043E\u043A"
     type: 0
     value: 20
     priority: 20
+    cooldownTurns: 0
+    maxUsesPerCombat: 0
   - actionName: "\u0425\u0418\u0418\u0418\u0418\u041B"
     type: 2
     value: 10
     priority: 30
-  visualPrefab: {fileID: 8285041180570305516, guid: 48f24fd822df0344c869beadbdb609d5, type: 3}
+    cooldownTurns: 0
+    maxUsesPerCombat: 0
+  minDrops: 1
+  maxDrops: 4
+  lootTable:
+  - item: {fileID: 11400000, guid: 4193b5eed5c03764d86c503445c81d69, type: 2}
+    dropChance: 100
+  - item: {fileID: 11400000, guid: 4193b5eed5c03764d86c503445c81d69, type: 2}
+    dropChance: 100

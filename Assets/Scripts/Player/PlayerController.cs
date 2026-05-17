@@ -1,12 +1,13 @@
-﻿using UnityEngine;
-using Generation;
+﻿using Generation;
 using UI;
+using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement Settings")]
     [SerializeField] private float moveDelay = 0.2f;
-    
+
     private Vector2Int currentPosition;
     private Direction currentDirection = Direction.North;
     private GridManager gridManager;
@@ -51,6 +52,28 @@ public class PlayerController : MonoBehaviour
         if (inputActions != null && inputActions.Player.MoveForward.IsPressed())
         {
             TryMoveForward();
+        }
+        if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
+        {
+            Vector2Int forwardPos = currentPosition + currentDirection.ToVector();
+
+            if (gridManager.IsValidPosition(forwardPos))
+            {
+                Tile targetTile = gridManager.GetTile(forwardPos);
+
+                if (targetTile != null && targetTile.HasChest && targetTile.ChestOnTile != null)
+                {
+                    ChestUI chestUI = FindAnyObjectByType<ChestUI>();
+                    if (chestUI != null)
+                    {
+                        chestUI.OpenChest(targetTile.ChestOnTile);
+                    }
+                    else
+                    {
+                        Debug.LogError("ChestUI component not found in scene! Make sure there's a ChestUI object in the scene.");
+                    }
+                }
+            }
         }
     }
     

@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f173863e542ebec4a903adf518efa286, type: 3}
-  m_Name: Key_Item
+  m_Name: ring_1
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  id: key_01
-  itemName: "\u041A\u043B\u044E\u0447"
-  description: "\u0422\u043E\u043F"
-  icon: {fileID: 1201019250, guid: aa2a2673a54151f42b2257f50b7f0e2f, type: 3}
-  isStackable: 1
-  maxStackSize: 10
-  attackBonus: 100
-  defenseBonus: 100
-  hpBonus: 100
-  grantedCard: {fileID: 11400000, guid: e268ffd7ae9eb9240b7abb4ebea14c96, type: 2}
+  id: ring_1
+  itemName: "\u043A\u043E\u043B\u044C\u0446\u043E"
+  description: "\u0442\u043E\u043F\u043E\u0432\u044B\u0439"
+  icon: {fileID: -838948734, guid: aa2a2673a54151f42b2257f50b7f0e2f, type: 3}
+  isStackable: 0
+  maxStackSize: 1
+  attackBonus: 0
+  defenseBonus: 0
+  hpBonus: 10
+  grantedCard: {fileID: 0}
   itemPrefab: {fileID: 0}
