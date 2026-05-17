@@ -14,15 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   enemyID: 2
   enemyName: Predat
-  maxHp: 10
+  maxHp: 20
   possibleActions:
-  - actionName: "\u042F\u0425\u0410\u0419 \u0411\u041B\u042F"
+  - actionName: Attack
     type: 0
     value: 40
     priority: 10
     cooldownTurns: 0
     maxUsesPerCombat: 0
-  - actionName: "\u0412\u0410\u0419 \u0411\u042F\u041B\u042F"
+  - actionName: Defence
     type: 0
     value: 10
     priority: 70

@@ -93,6 +93,8 @@ public class CombatManager : MonoBehaviour
         UpdateStaminaUI();
         turnState = TurnState.PlayerTurn;
 
+        GameBoyController.Instance.StartBattle();
+
         if (handUI != null)
         {
             handUI.DrawHand();
@@ -241,6 +243,8 @@ public class CombatManager : MonoBehaviour
 
         currentStamina = 0;
         UpdateStaminaUI();
+
+        GameBoyController.Instance.EndBattle();
 
         if (handUI != null)
         {
