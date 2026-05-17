@@ -38,92 +38,101 @@ public class Inventory : MonoBehaviour
 
     public void SwapSlots(int fromIndex, int toIndex)
     {
-        if (fromIndex < 0 || fromIndex >= TotalSlots || toIndex < 0 || toIndex >= TotalSlots) return;
+        // Проверка на корректность индексов
+        if (fromIndex < 0 || fromIndex >= slots.Length || toIndex < 0 || toIndex >= slots.Length) return;
         if (fromIndex == toIndex) return;
 
         InventorySlot fromSlot = slots[fromIndex];
         InventorySlot toSlot = slots[toIndex];
 
+        if (fromSlot == null || fromSlot.IsEmpty) return;
+
         bool fromIsEquip = IsEquipmentSlot(fromIndex);
         bool toIsEquip = IsEquipmentSlot(toIndex);
 
-        // 1. Снимаем эффекты перед перемещением
-        if (fromIsEquip && !fromSlot.IsEmpty) EquipmentManager.Instance.Unequip(fromSlot.itemData);
-        if (toIsEquip && !toSlot.IsEmpty) EquipmentManager.Instance.Unequip(toSlot.itemData);
-
-        // 2. Логика: Тянем СТАК из инвентаря в экипировку (отделяем 1 предмет)
-        if (!fromIsEquip && toIsEquip && fromSlot.amount > 1)
+        // 1. УМНОЕ ОБЪЕДИНЕНИЕ С УЧЕТОМ MAX STACK SIZE
+        if (toSlot != null && !toSlot.IsEmpty && fromSlot.itemData == toSlot.itemData)
         {
-            if (toSlot.IsEmpty)
+            // Проверяем, разрешено ли предмету стакаться, и что мы не пытаемся стакать внутри экипировки
+            if (fromSlot.itemData.isStackable && !toIsEquip)
+            {
+                int maxStack = fromSlot.itemData.maxStackSize;
+
+                // Если в целевом слоте еще есть место
+                if (toSlot.amount < maxStack)
+                {
+                    int spaceLeft = maxStack - toSlot.amount;
+                    int amountToMove = Mathf.Min(fromSlot.amount, spaceLeft); 
+
+                    toSlot.amount += amountToMove;
+                    fromSlot.amount -= amountToMove;
+
+                    if (fromSlot.amount <= 0)
+                    {
+                        if (fromIsEquip && EquipmentManager.Instance != null)
+                            EquipmentManager.Instance.Unequip(fromSlot.itemData);
+
+                        fromSlot.itemData = null;
+                        fromSlot.amount = 0;
+                    }
+
+                    return; 
+                }
+            }
+        }
+
+        // 2. ЗАЩИТА СПЕЦИАЛЬНЫХ ЯЧЕЕК ОТ СТАКОВ ПРИ ОБМЕНЕ
+
+        if (fromIsEquip && toSlot != null && !toSlot.IsEmpty && toSlot.amount > 1)
+        {
+            Debug.LogWarning("Нельзя поменять экипированную вещь местами со стаком предметов!");
+            return;
+        }
+
+        if (toIsEquip && fromSlot.amount > 1)
+        {
+            if (toSlot == null || toSlot.IsEmpty)
             {
                 toSlot.itemData = fromSlot.itemData;
                 toSlot.amount = 1;
-                fromSlot.amount -= 1;
+                fromSlot.amount--;
 
-                EquipmentManager.Instance.Equip(toSlot.itemData);
+                if (EquipmentManager.Instance != null)
+                    EquipmentManager.Instance.Equip(toSlot.itemData);
                 return;
-            }
-            else if (fromSlot.itemData.id != toSlot.itemData.id)
-            {
-                // Если в слоте экипировки лежит другой предмет, пробуем вернуть его в инвентарь
-                InventorySlot emptyInInventory = FindEmptyInventorySlot();
-                if (emptyInInventory != null)
-                {
-                    emptyInInventory.itemData = toSlot.itemData;
-                    emptyInInventory.amount = toSlot.amount;
-
-                    toSlot.itemData = fromSlot.itemData;
-                    toSlot.amount = 1;
-                    fromSlot.amount -= 1;
-
-                    EquipmentManager.Instance.Equip(toSlot.itemData);
-                    return;
-                }
-                else
-                {
-                    // Нет места в инвентаре для обмена шмотки — отмена
-                    EquipmentManager.Instance.Equip(toSlot.itemData);
-                    return;
-                }
             }
             else
             {
-                // Пытаемся положить тот же предмет в слот экипировки, где он уже есть — отмена
-                EquipmentManager.Instance.Equip(toSlot.itemData);
+                Debug.LogWarning("Нельзя засунуть стак предметов в занятый слот экипировки!");
                 return;
             }
         }
 
-        // 3. Логика: Возвращаем предмет из экипировки в инвентарь на СТАК такого же предмета
-        if (fromIsEquip && !toIsEquip && !fromSlot.IsEmpty && !toSlot.IsEmpty)
-        {
-            if (fromSlot.itemData.id == toSlot.itemData.id && toSlot.itemData.isStackable)
-            {
-                int spaceLeft = toSlot.itemData.maxStackSize - toSlot.amount;
-                if (spaceLeft >= fromSlot.amount)
-                {
-                    toSlot.amount += fromSlot.amount;
-                    fromSlot.Clear();
-                    // Слот очищен, бафф уже снят в шаге 1. Всё ок.
-                    return;
-                }
-            }
-        }
+        // 3. ОБЫЧНЫЙ БЕЗОПАСНЫЙ ОБМЕН (СВАП) ПРЕДМЕТОВ
 
-        // 4. Обычный полноценный обмен (работает и для перетаскивания НАЗАД из экипировки в пустой/занятый слот)
-        InventorySlot temp = new InventorySlot();
-        temp.itemData = fromSlot.itemData;
-        temp.amount = fromSlot.amount;
+        // Снимаем шмотки перед обменом
+        if (fromIsEquip && !fromSlot.IsEmpty && EquipmentManager.Instance != null)
+            EquipmentManager.Instance.Unequip(fromSlot.itemData);
+
+        if (toIsEquip && toSlot != null && !toSlot.IsEmpty && EquipmentManager.Instance != null)
+            EquipmentManager.Instance.Unequip(toSlot.itemData);
+
+        // Стандартный алгоритм обмена данными
+        ItemData tempItem = fromSlot.itemData;
+        int tempAmount = fromSlot.amount;
 
         fromSlot.itemData = toSlot.itemData;
         fromSlot.amount = toSlot.amount;
 
-        toSlot.itemData = temp.itemData;
-        toSlot.amount = temp.amount;
+        toSlot.itemData = tempItem;
+        toSlot.amount = tempAmount;
 
-        // 5. Применяем эффекты к тем предметам, которые оказались в слотах экипировки после обмена
-        if (fromIsEquip && !fromSlot.IsEmpty) EquipmentManager.Instance.Equip(fromSlot.itemData);
-        if (toIsEquip && !toSlot.IsEmpty) EquipmentManager.Instance.Equip(toSlot.itemData);
+        // Надеваем шмотки обратно в новые слоты
+        if (fromIsEquip && !fromSlot.IsEmpty && EquipmentManager.Instance != null)
+            EquipmentManager.Instance.Equip(fromSlot.itemData);
+
+        if (toIsEquip && !toSlot.IsEmpty && EquipmentManager.Instance != null)
+            EquipmentManager.Instance.Equip(toSlot.itemData);
     }
 
     public bool AddItem(ItemData itemData, int amount)

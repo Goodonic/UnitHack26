@@ -265,20 +265,21 @@ public class CombatManager : MonoBehaviour
 
         if (playerWon && currentEnemyTile != null && currentEnemyData != null)
         {
-            Debug.Log("ПОБЕДА! Спавним сундук...");
+            Debug.Log("ПОБЕДА! Враг повержен.");
+
+            currentEnemyTile.EnemyDataOnTile = null;
 
             List<ItemData> generatedLoot = currentEnemyData.GenerateLoot();
 
             if (generatedLoot.Count > 0 && chestPrefab != null)
             {
                 Vector3 spawnPos = LevelBuilder.Instance.GetCellWorldPosition(currentEnemyTile.Position);
-
                 GameObject chestObj = Instantiate(chestPrefab, spawnPos, Quaternion.identity);
 
                 Chest chest = chestObj.GetComponent<Chest>();
                 if (chest != null)
                 {
-                    chest.InitChest(generatedLoot);
+                    chest.InitChest(currentEnemyTile, generatedLoot);
                 }
             }
         }
@@ -287,7 +288,6 @@ public class CombatManager : MonoBehaviour
             Destroy(currentEnemy.gameObject);
 
         currentEnemy = null;
-
         currentEnemyData = null;
     }
 }

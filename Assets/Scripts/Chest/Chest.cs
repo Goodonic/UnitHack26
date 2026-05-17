@@ -4,15 +4,21 @@ using UnityEngine;
 [RequireComponent(typeof(Inventory))]
 public class Chest : MonoBehaviour
 {
-    [Header("References")]
     private Inventory chestInventory;
+    private Tile myTile;
 
     private void Awake()
     {
         chestInventory = GetComponent<Inventory>();
     }
-    public void InitChest(List<ItemData> loot)
+    public void InitChest(Tile tile, List<ItemData> loot)
     {
+        myTile = tile;
+        if (myTile != null)
+        {
+            myTile.HasChest = true;
+        }
+
         if (chestInventory == null) chestInventory = GetComponent<Inventory>();
 
         foreach (var slot in chestInventory.slots)
@@ -25,7 +31,7 @@ public class Chest : MonoBehaviour
             chestInventory.AddItem(item, 1);
         }
 
-        Debug.Log($"Сундук создан! Предметов внутри: {loot.Count}");
+        Debug.Log($"Сундук создан на клетке {myTile.Position}! Предметов: {loot.Count}");
     }
 
     public Inventory GetInventory()
@@ -35,8 +41,13 @@ public class Chest : MonoBehaviour
 
     public void DestroyChest()
     {
-        // Добавить анимацию
-        Debug.Log("Сундук исчезает с карты.");
+        if (myTile != null)
+        {
+            myTile.HasChest = false;
+            myTile.EnemyDataOnTile = null;
+        }
+
+        Debug.Log("Сундук и зона врага уничтожены.");
         Destroy(gameObject);
     }
 }
