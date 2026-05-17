@@ -1,16 +1,25 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UI;
 
 namespace Generation
 {
-    public class DangeonGenerator : MonoBehaviour
+    public class DungeonGenerator : MonoBehaviour
     {
+        public static DungeonGenerator Instance { get; private set; }
+
         [Header("Generation Settings")]
         [SerializeField] private int width = 41;
         [SerializeField] private int height = 41;
         [SerializeField] private int enemyCount = 5;
         [SerializeField] private Vector2Int startPosition = new Vector2Int(1, 1);
+
+        [Header("Floors")]
+        [SerializeField] private int maxFloors = 3;
+
+        public int CurrentFloor { get; private set; } = 1;
+        public int MaxFloors => maxFloors;
 
         [Header("BSP Settings")]
         [SerializeField] private int minLeafSize = 8;
@@ -21,7 +30,7 @@ namespace Generation
         [Header("Cave Rooms")]
         [SerializeField, Range(0f, 1f)] private float caveRoomChance = 0.35f;
         [SerializeField, Range(0f, 1f)] private float caveTileRemoveChance = 0.22f;
-
+        
         [Header("Ground")]
         [SerializeField, Range(0f, 1f)] private float dirtChance = 0.18f;
         [SerializeField, Range(0f, 1f)] private float waterChance = 0.05f;
@@ -31,6 +40,18 @@ namespace Generation
         private readonly List<BspLeaf> leaves = new List<BspLeaf>();
         private readonly List<Room> rooms = new List<Room>();
         private readonly HashSet<Vector2Int> floorPositions = new HashSet<Vector2Int>();
+
+        private void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
 
         private void Start()
         {
@@ -52,7 +73,7 @@ namespace Generation
 
             CreateRooms();
             ConnectRooms();
-
+            
             ApplyWalls();
             PlaceStartAndExit();
 
@@ -99,6 +120,26 @@ namespace Generation
             AssignGroundTypes();
 
             LevelBuilder.Instance.BuildLevel(gridManager.GetGrid());
+
+            if (MinimapRenderer.Instance != null)
+            {
+                MinimapRenderer.Instance.DrawMap(gridManager.GetGrid());
+            }
+
+            Debug.Log($"Generated floor {CurrentFloor}/{maxFloors}");
+        }
+
+        public bool TryGoToNextFloor()
+        {
+            if (CurrentFloor >= maxFloors)
+            {
+                Debug.Log("Dungeon complete! All floors finished.");
+                return false;
+            }
+
+            CurrentFloor++;
+            GenerateDungeon();
+            return true;
         }
            
         private void SplitLeaf(BspLeaf leaf)

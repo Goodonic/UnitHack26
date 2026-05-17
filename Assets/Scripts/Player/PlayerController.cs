@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using Generation;
+using UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -9,7 +11,9 @@ public class PlayerController : MonoBehaviour
     private Direction currentDirection = Direction.North;
     private GridManager gridManager;
     private LevelBuilder levelBuilder;
+    private DungeonGenerator dungeonGenerator;
     private CameraMotor cameraMotor;
+    private PlayerLight playerLight;
     private bool isMoving = false;
     private bool inCombat = false;
 
@@ -20,9 +24,17 @@ public class PlayerController : MonoBehaviour
         gridManager = GridManager.Instance;
         levelBuilder = LevelBuilder.Instance;
         cameraMotor = GetComponent<CameraMotor>();
+        playerLight = GetComponentInChildren<PlayerLight>();
+        dungeonGenerator = DungeonGenerator.Instance;
+        
+        if (dungeonGenerator == null)
+        {   
+            dungeonGenerator = FindObjectOfType<DungeonGenerator>();
+        }
         
         FindStartPosition();
         UpdateCameraPosition();
+        
         
         // Initialize input system
         inputActions = new PlayerInputActions();
@@ -56,29 +68,29 @@ public class PlayerController : MonoBehaviour
 
     private void TryMoveForward()
     {
-        if (isMoving || inCombat) return;
+        if (isMoving || inCombat || cameraMotor.IsRotating) return;
 
         Vector2Int targetPosition = currentPosition + currentDirection.ToVector();
-        
+
         if (CanMoveTo(targetPosition))
         {
             StartCoroutine(MoveToPosition(targetPosition));
         }
     }
-    
+
     private void TryMoveBackward()
     {
-        if (isMoving || inCombat) return;
+        if (isMoving || inCombat || cameraMotor.IsRotating) return;
 
         Direction opposite = GetOppositeDirection(currentDirection);
         Vector2Int targetPosition = currentPosition + opposite.ToVector();
-        
+
         if (CanMoveTo(targetPosition))
         {
             StartCoroutine(MoveToPosition(targetPosition));
         }
     }
-    
+
     private bool CanMoveTo(Vector2Int targetPosition)
     {
         if (!gridManager.IsValidPosition(targetPosition))
@@ -132,16 +144,21 @@ public class PlayerController : MonoBehaviour
         
         transform.position = targetPos;
         currentPosition = targetPosition;
+
+        if (MinimapRenderer.Instance != null)
+        {
+            MinimapRenderer.Instance.SetPlayerPosition(currentPosition);
+        }
         
         CheckForExit();
         CheckForEnemy();
 
         isMoving = false;
     }
-    
+
     private void RotateLeft()
     {
-        if (isMoving || inCombat) return;
+        if (isMoving || inCombat || cameraMotor.IsRotating) return;
 
         currentDirection = currentDirection switch
         {
@@ -151,13 +168,13 @@ public class PlayerController : MonoBehaviour
             Direction.East => Direction.North,
             _ => currentDirection
         };
-        
+
         cameraMotor.RotateLeft();
     }
-    
+
     private void RotateRight()
     {
-        if (isMoving || inCombat) return;
+        if (isMoving || inCombat || cameraMotor.IsRotating) return;
 
         currentDirection = currentDirection switch
         {
@@ -167,7 +184,7 @@ public class PlayerController : MonoBehaviour
             Direction.West => Direction.North,
             _ => currentDirection
         };
-        
+
         cameraMotor.RotateRight();
     }
 
@@ -197,6 +214,11 @@ public class PlayerController : MonoBehaviour
         pos.y = 1.7f;
         transform.position = pos;
         cameraMotor.SetRotation(currentDirection);
+
+        if (MinimapRenderer.Instance != null)
+        {
+            MinimapRenderer.Instance.SetPlayerPosition(currentPosition);
+        }
     }
 
     private void CheckForEnemy()
@@ -216,10 +238,28 @@ public class PlayerController : MonoBehaviour
     private void CheckForExit()
     {
         Tile currentTile = gridManager.GetTile(currentPosition);
-        if (currentTile.IsExit)
+
+        if (!currentTile.IsExit)
         {
-            Debug.Log("Level Complete!");
-            //где?
+            return;
+        }
+
+        if (dungeonGenerator == null)
+        {
+            Debug.Log("Dungeon generator not found.");
+            return;
+        }
+
+        if (dungeonGenerator.TryGoToNextFloor())
+        {
+            FindStartPosition();
+            UpdateCameraPosition();
+
+            Debug.Log($"Level {dungeonGenerator.CurrentFloor} completed!");
+        }
+        else
+        {
+            Debug.Log("All floors completed!");
         }
     }
 }

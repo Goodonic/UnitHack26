@@ -3,10 +3,13 @@
 public class LevelBuilder : MonoBehaviour
 {
     public static LevelBuilder Instance { get; private set; }
+
+    private GameObject currentLevel;
+
     [Header("Size")]
     [SerializeField] private float CELL_SIZE = 3f;
     [SerializeField] private float WALL_HEIGHT = 3f;
-    
+
     [Header("Prefabs")]
     [SerializeField] private GameObject floorPrefab;
     [SerializeField] private GameObject wallPrefab;
@@ -43,24 +46,29 @@ public class LevelBuilder : MonoBehaviour
     
     public void BuildLevel(Tile[,] grid)
     {
+        if (currentLevel != null)
+        {
+            Destroy(currentLevel);
+        }
+
         int width = grid.GetLength(0);
         int height = grid.GetLength(1);
-        
-        GameObject levelParent = new GameObject("Level");
-        
+
+        currentLevel = new GameObject("Level");
+
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
             {
                 Tile tile = grid[x, y];
                 Vector3 worldPos = new Vector3(x * CELL_SIZE, 0, y * CELL_SIZE);
-                
-                BuildFloor(tile, worldPos, levelParent.transform);
-                BuildWalls(tile, worldPos, levelParent.transform);
+
+                BuildFloor(tile, worldPos, currentLevel.transform);
+                BuildWalls(tile, worldPos, currentLevel.transform);
             }
         }
     }
-    
+
     private void BuildFloor(Tile tile, Vector3 position, Transform parent)
     {
         GameObject floor = Instantiate(floorPrefab, position, Quaternion.identity, parent);
