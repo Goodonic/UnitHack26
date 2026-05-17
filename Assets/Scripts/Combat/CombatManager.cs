@@ -32,8 +32,7 @@ public class CombatManager : MonoBehaviour
 
     private int currentStamina;
 
-    private GameObject enemyVisual;
-    private EnemyCombat enemy;
+    private Enemy currentEnemy;
 
     public System.Action<CardInstance> OnCardUsed;
 
@@ -82,50 +81,42 @@ public class CombatManager : MonoBehaviour
             staminaText.text = $"Stamina: {currentStamina}/{maxStamina}";
     }
 
-    public void StartCombat(Tile enemyTile)
+    public void StartCombat(Tile enemyTile, EnemyData enemyDataToSpawn)
     {
         if (isCombatActive) return;
 
         isCombatActive = true;
         player.SetCombatState(true);
-
         SetCombatUI(true);
 
         currentStamina = maxStamina;
         UpdateStaminaUI();
-
         turnState = TurnState.PlayerTurn;
 
-        //пересбор руки каждый бой
         if (handUI != null)
         {
             handUI.DrawHand();
         }
 
-        Debug.Log("COMBAT STARTED");
+        Debug.Log($"COMBAT STARTED AGAINST: {enemyDataToSpawn.enemyName} (ID: {enemyDataToSpawn.enemyID})");
 
         Vector3 spawnPos = LevelBuilder.Instance.GetCellWorldPosition(enemyTile.Position);
-
         Vector3 lookDir = player.transform.forward;
         lookDir.y = 0f;
         lookDir.Normalize();
 
-        enemyVisual = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        Vector3 finalSpawnPos = spawnPos + lookDir * enemyDistance + Vector3.up * enemyHeightOffset;
 
-        enemyVisual.tag = "Enemy";
-
-        enemyVisual.transform.position = spawnPos + lookDir * enemyDistance + Vector3.up * enemyHeightOffset;
-
+        GameObject enemyVisual = Instantiate(enemyDataToSpawn.visualPrefab, finalSpawnPos, Quaternion.identity);
         enemyVisual.transform.localScale = Vector3.one * enemyScale;
 
-        enemyVisual.GetComponent<Renderer>().material.color = Color.red;
-
-        enemy = enemyVisual.AddComponent<EnemyCombat>();
+        currentEnemy = enemyVisual.AddComponent<Enemy>();
+        currentEnemy.Init(enemyDataToSpawn);
     }
 
     public void PlayCard(CardInstance card)
     {
-        if (!isCombatActive || enemy == null) return;
+        if (!isCombatActive || currentEnemy == null) return;
 
         if (!IsPlayerTurn)
         {
@@ -145,9 +136,9 @@ public class CombatManager : MonoBehaviour
         switch (card.data.effectType)
         {
             case CardEffectType.Attack:
-                enemy.TakeDamage(card.data.value);
+                currentEnemy.TakeDamage(card.data.value);
 
-                if (enemy != null && enemy.IsDead())
+                if (currentEnemy != null && currentEnemy.IsDead)
                 {
                     OnCardUsed?.Invoke(card);
                     EndCombat(true);
@@ -207,9 +198,12 @@ public class CombatManager : MonoBehaviour
 
     private void EnemyTurn()
     {
-        if (enemy == null) return;
+        if (currentEnemy == null) return;
 
-        enemy.Attack(playerCombat);
+        currentEnemy.StartTurn();
+
+        currentEnemy.PerformRandomAction(playerCombat);
+
         playerCombat.ResetBlock();
 
         if (playerCombat.currentHp <= 0)
@@ -229,7 +223,7 @@ public class CombatManager : MonoBehaviour
 
     private bool CheckEnemyDeath()
     {
-        if (enemy != null && enemy.IsDead())
+        if (currentEnemy != null && currentEnemy.IsDead)
         {
             EndCombat(true);
             return true;
@@ -253,9 +247,9 @@ public class CombatManager : MonoBehaviour
             handUI.ClearHand();
         }
 
-        if (enemyVisual != null)
-            Destroy(enemyVisual);
+        if (currentEnemy != null)
+            Destroy(currentEnemy.gameObject);
 
-        enemy = null;
+        currentEnemy = null;
     }
 }

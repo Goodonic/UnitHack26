@@ -18,7 +18,7 @@ public class PlayerController : MonoBehaviour
     private bool inCombat = false;
 
     private PlayerInputActions inputActions;
-    
+
     void Start()
     {
         gridManager = GridManager.Instance;
@@ -231,7 +231,7 @@ public class PlayerController : MonoBehaviour
 
         if (currentTile.HasEnemy)
         {
-            CombatManager.Instance.StartCombat(currentTile);
+            CombatManager.Instance.StartCombat(currentTile, currentTile.EnemyDataOnTile);
         }
     }
 
