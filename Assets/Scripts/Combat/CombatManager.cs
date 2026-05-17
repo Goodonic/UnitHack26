@@ -1,5 +1,6 @@
-using UnityEngine;
+using System.Collections.Generic;
 using TMPro;
+using UnityEngine;
 
 public class CombatManager : MonoBehaviour
 {
@@ -24,6 +25,12 @@ public class CombatManager : MonoBehaviour
 
     [Header("UI Stats")]
     [SerializeField] private TMP_Text staminaText;
+
+    [Header("Loot System")]
+    [SerializeField] private GameObject chestPrefab;
+
+    private Tile currentEnemyTile;
+    private EnemyData currentEnemyData; 
 
     [Header("Combat View")]
     [SerializeField] private float enemyDistance = 0.0f;
@@ -84,6 +91,9 @@ public class CombatManager : MonoBehaviour
     public void StartCombat(Tile enemyTile, EnemyData enemyDataToSpawn)
     {
         if (isCombatActive) return;
+
+        currentEnemyTile = enemyTile;
+        currentEnemyData = enemyDataToSpawn;
 
         isCombatActive = true;
         player.SetCombatState(true);
@@ -248,20 +258,36 @@ public class CombatManager : MonoBehaviour
     {
         isCombatActive = false;
         player.SetCombatState(false);
-
         SetCombatUI(false);
 
         currentStamina = 0;
         UpdateStaminaUI();
 
-        if (handUI != null)
+        if (playerWon && currentEnemyTile != null && currentEnemyData != null)
         {
-            handUI.ClearHand();
+            Debug.Log("ПОБЕДА! Спавним сундук...");
+
+            List<ItemData> generatedLoot = currentEnemyData.GenerateLoot();
+
+            if (generatedLoot.Count > 0 && chestPrefab != null)
+            {
+                Vector3 spawnPos = LevelBuilder.Instance.GetCellWorldPosition(currentEnemyTile.Position);
+
+                GameObject chestObj = Instantiate(chestPrefab, spawnPos, Quaternion.identity);
+
+                Chest chest = chestObj.GetComponent<Chest>();
+                if (chest != null)
+                {
+                    chest.InitChest(generatedLoot);
+                }
+            }
         }
 
         if (currentEnemy != null)
             Destroy(currentEnemy.gameObject);
 
         currentEnemy = null;
+
+        currentEnemyData = null;
     }
 }

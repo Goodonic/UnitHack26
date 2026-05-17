@@ -74,9 +74,25 @@ public class PlayerController : MonoBehaviour
 
     private void TryMoveForward()
     {
-        if (isMoving || inCombat || cameraMotor.IsRotating) return;
+        if (isMoving || inCombat) return;
 
         Vector2Int targetPosition = currentPosition + currentDirection.ToVector();
+
+        if (gridManager.IsValidPosition(targetPosition))
+        {
+            Tile targetTile = gridManager.GetTile(targetPosition);
+
+            if (targetTile != null && targetTile.HasEnemy)
+            {
+                CombatManager.Instance.StartCombat(targetTile, targetTile.EnemyDataOnTile);
+                return;
+            }
+            if (targetTile != null && targetTile.HasChest)
+            {
+                Debug.Log("Путь заблокирован сундуком!");
+                return;
+            }
+        }
 
         if (CanMoveTo(targetPosition))
         {
@@ -86,10 +102,21 @@ public class PlayerController : MonoBehaviour
 
     private void TryMoveBackward()
     {
-        if (isMoving || inCombat || cameraMotor.IsRotating) return;
+        if (isMoving || inCombat) return;
 
         Direction opposite = GetOppositeDirection(currentDirection);
         Vector2Int targetPosition = currentPosition + opposite.ToVector();
+
+        if (gridManager.IsValidPosition(targetPosition))
+        {
+            Tile targetTile = gridManager.GetTile(targetPosition);
+
+            if (targetTile != null && (targetTile.HasEnemy || targetTile.HasChest))
+            {
+                Debug.Log("Назад идти нельзя — там препятствие/враг!");
+                return;
+            }
+        }
 
         if (CanMoveTo(targetPosition))
         {
@@ -131,14 +158,14 @@ public class PlayerController : MonoBehaviour
             _ => Direction.North
         };
     }
-    
+
     private System.Collections.IEnumerator MoveToPosition(Vector2Int targetPosition)
     {
         isMoving = true;
         Vector3 startPos = transform.position;
         Vector3 targetPos = levelBuilder.GetCellWorldPosition(targetPosition);
         targetPos.y = transform.position.y;
-        
+
         float elapsed = 0;
         while (elapsed < moveDelay)
         {
@@ -147,17 +174,11 @@ public class PlayerController : MonoBehaviour
             transform.position = Vector3.Lerp(startPos, targetPos, t);
             yield return null;
         }
-        
+
         transform.position = targetPos;
         currentPosition = targetPosition;
 
-        if (MinimapRenderer.Instance != null)
-        {
-            MinimapRenderer.Instance.SetPlayerPosition(currentPosition);
-        }
-        
         CheckForExit();
-        CheckForEnemy();
 
         isMoving = false;
     }

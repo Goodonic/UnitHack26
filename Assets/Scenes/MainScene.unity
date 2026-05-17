@@ -1861,6 +1861,7 @@ MonoBehaviour:
   playZoneUI: {fileID: 1129934440}
   handUI: {fileID: 1592378051}
   staminaText: {fileID: 1353727755}
+  chestPrefab: {fileID: 0}
   enemyDistance: 1.5
   enemyHeightOffset: 2
   enemyScale: 0.6
@@ -2631,6 +2632,63 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2124783562}
   m_CullTransparentMesh: 1
+--- !u!1001 &2387623618748209514
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 504457732844405967, guid: 8c623166b2b4e7b43b97d86b15e4b428, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1358.3009
+      objectReference: {fileID: 0}
+    - target: {fileID: 504457732844405967, guid: 8c623166b2b4e7b43b97d86b15e4b428, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 504457732844405967, guid: 8c623166b2b4e7b43b97d86b15e4b428, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -2045.096
+      objectReference: {fileID: 0}
+    - target: {fileID: 504457732844405967, guid: 8c623166b2b4e7b43b97d86b15e4b428, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 504457732844405967, guid: 8c623166b2b4e7b43b97d86b15e4b428, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 504457732844405967, guid: 8c623166b2b4e7b43b97d86b15e4b428, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 504457732844405967, guid: 8c623166b2b4e7b43b97d86b15e4b428, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 504457732844405967, guid: 8c623166b2b4e7b43b97d86b15e4b428, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 504457732844405967, guid: 8c623166b2b4e7b43b97d86b15e4b428, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 504457732844405967, guid: 8c623166b2b4e7b43b97d86b15e4b428, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 886049202907618933, guid: 8c623166b2b4e7b43b97d86b15e4b428, type: 3}
+      propertyPath: m_Name
+      value: Chest_Prefab
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8c623166b2b4e7b43b97d86b15e4b428, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -2648,3 +2706,4 @@ SceneRoots:
   - {fileID: 350742036}
   - {fileID: 652938934}
   - {fileID: 1562895948}
+  - {fileID: 2387623618748209514}
