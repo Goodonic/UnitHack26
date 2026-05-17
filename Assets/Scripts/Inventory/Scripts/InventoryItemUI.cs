@@ -57,12 +57,9 @@ public class InventoryItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         canvasGroup.blocksRaycasts = true;
         canvasGroup.alpha = 1f;
 
-        // Возвращаем предмет в иерархию ячейки
         transform.SetParent(originalParent);
         rectTransform.anchoredPosition = Vector2.zero;
 
-        // ДОБАВЬ ЭТУ СТРОКУ:
-        // Обновляем визуал всего инвентаря ПОСЛЕ того, как объект вернулся на место
         FindAnyObjectByType<InventoryUI>().RefreshAll();
     }
 }
