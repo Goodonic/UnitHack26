@@ -40,17 +40,23 @@ public class PlayerController : MonoBehaviour
         inputActions.Player.Enable();
         
         // Subscribe to input events
-        inputActions.Player.MoveForward.performed += ctx => TryMoveForward();
         inputActions.Player.MoveBackward.performed += ctx => TryMoveBackward();
         inputActions.Player.RotateLeft.performed += ctx => RotateLeft();
         inputActions.Player.RotateRight.performed += ctx => RotateRight();
+    }
+    
+    void Update()
+    {
+        if (inputActions != null && inputActions.Player.MoveForward.IsPressed())
+        {
+            TryMoveForward();
+        }
     }
     
     void OnDestroy()
     {
         if (inputActions != null)
         {
-            inputActions.Player.MoveForward.performed -= ctx => TryMoveForward();
             inputActions.Player.MoveBackward.performed -= ctx => TryMoveBackward();
             inputActions.Player.RotateLeft.performed -= ctx => RotateLeft();
             inputActions.Player.RotateRight.performed -= ctx => RotateRight();
@@ -195,9 +201,6 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
-        
-        // // Если старт не найден, начинаем с центра
-        // currentPosition = new Vector2Int(gridManager.Width / 2, gridManager.Height / 2);
     }
     
     private void UpdateCameraPosition()
