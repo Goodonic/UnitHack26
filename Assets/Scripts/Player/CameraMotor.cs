@@ -14,20 +14,25 @@ public class CameraMotor : MonoBehaviour
     private Quaternion startRotation;
 
     public bool IsRotating => isRotating;
-    
+
     void Start()
     {
         playerCamera = GetComponent<Camera>();
-        
         if (playerCamera == null)
         {
             playerCamera = gameObject.AddComponent<Camera>();
         }
 
+        int previewLayer = LayerMask.NameToLayer("ItemPreview");
+        if (previewLayer != -1)
+        {
+            playerCamera.cullingMask &= ~(1 << previewLayer);
+        }
+
         playerCamera.fieldOfView = fieldOfView;
         targetRotation = transform.rotation;
     }
-    
+
     void Update()
     {
         if (isRotating)
