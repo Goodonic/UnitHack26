@@ -23,7 +23,7 @@ public class PlayerController : MonoBehaviour
     {
         gridManager = GridManager.Instance;
         levelBuilder = LevelBuilder.Instance;
-        cameraMotor = GetComponent<CameraMotor>();
+        cameraMotor = GetComponentInChildren<CameraMotor>();
         playerLight = GetComponentInChildren<PlayerLight>();
         dungeonGenerator = DungeonGenerator.Instance;
         
