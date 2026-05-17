@@ -23,7 +23,12 @@ namespace Generation
 
         [Header("Enemies")]
         [SerializeField] private List<EnemyData> possibleEnemies;
-
+        
+        [Header("Boss")]
+        [SerializeField] private EnemyData bossEnemy;
+        
+        public EnemyData BossEnemy => bossEnemy;
+        
         [Header("BSP Settings")]
         [SerializeField] private int minLeafSize = 8;
         [SerializeField] private int maxLeafSize = 16;
