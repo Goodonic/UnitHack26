@@ -1,5 +1,6 @@
-using UnityEngine;
+using System.Collections.Generic;
 using TMPro;
+using UnityEngine;
 
 public class CombatManager : MonoBehaviour
 {
@@ -25,15 +26,22 @@ public class CombatManager : MonoBehaviour
     [Header("UI Stats")]
     [SerializeField] private TMP_Text staminaText;
 
+    [Header("Loot System")]
+    [SerializeField] private GameObject chestPrefab;
+
+    private Tile currentEnemyTile;
+    private EnemyData currentEnemyData;
+
     [Header("Combat View")]
     [SerializeField] private float enemyDistance = 0.0f;
     [SerializeField] private float enemyHeightOffset = 2.0f;
     [SerializeField] private float enemyScale = 0.6f;
 
+    [SerializeField] private VictoryUI victoryUI;
+
     private int currentStamina;
 
     private Enemy currentEnemy;
-    private Tile currentEnemyTile;
 
     public System.Action<CardInstance> OnCardUsed;
 
@@ -86,6 +94,9 @@ public class CombatManager : MonoBehaviour
     {
         if (isCombatActive) return;
 
+        currentEnemyTile = enemyTile;
+        currentEnemyData = enemyDataToSpawn;
+
         isCombatActive = true;
         player.SetCombatState(true);
         SetCombatUI(true);
@@ -103,6 +114,12 @@ public class CombatManager : MonoBehaviour
         turnState = TurnState.PlayerTurn;
 
         GameBoyController.Instance.StartBattle();
+
+        if (EquipmentManager.Instance != null)
+        {
+            playerCombat.maxHp = 50 + EquipmentManager.Instance.bonusMaxHp;
+            playerCombat.Heal(0);
+        }
 
         if (handUI != null)
         {
@@ -147,7 +164,10 @@ public class CombatManager : MonoBehaviour
         switch (card.data.effectType)
         {
             case CardEffectType.Attack:
-                currentEnemy.TakeDamage(card.data.value);
+                int finalDamage = card.data.value + (EquipmentManager.Instance != null ? EquipmentManager.Instance.bonusAttack : 0);
+
+                currentEnemy.TakeDamage(finalDamage);
+                Debug.Log($"Разыграна Атака! Базовый урон: {card.data.value} + Бонус экипировки: {(EquipmentManager.Instance != null ? EquipmentManager.Instance.bonusAttack : 0)} = Итоговый урон: {finalDamage}");
 
                 if (currentEnemy != null && currentEnemy.IsDead)
                 {
@@ -158,7 +178,10 @@ public class CombatManager : MonoBehaviour
                 break;
 
             case CardEffectType.Defend:
-                playerCombat.AddBlock(card.data.value);
+                int finalBlock = card.data.value + (EquipmentManager.Instance != null ? EquipmentManager.Instance.bonusDefense : 0);
+
+                playerCombat.AddBlock(finalBlock);
+                Debug.Log($"Разыграна Защита! Базовый блок: {card.data.value} + Бонус экипировки: {(EquipmentManager.Instance != null ? EquipmentManager.Instance.bonusDefense : 0)} = Итоговый блок: {finalBlock}");
                 break;
 
             case CardEffectType.Heal:
@@ -247,7 +270,6 @@ public class CombatManager : MonoBehaviour
     {
         isCombatActive = false;
         player.SetCombatState(false);
-
         SetCombatUI(false);
 
         currentStamina = 0;
@@ -258,6 +280,36 @@ public class CombatManager : MonoBehaviour
         if (handUI != null)
         {
             handUI.ClearHand();
+        }
+
+        if (playerWon && currentEnemyTile != null && currentEnemyData != null)
+        {
+            Debug.Log("ПОБЕДА! Враг повержен.");
+
+            currentEnemyTile.EnemyDataOnTile = null;
+
+            if (victoryUI != null)
+            {
+                victoryUI.ShowVictoryScreen();
+            }
+            else
+            {
+                Debug.LogError("VictoryUI не назначен в CombatManager!");
+            }
+
+            List<ItemData> generatedLoot = currentEnemyData.GenerateLoot();
+
+            if (generatedLoot.Count > 0 && chestPrefab != null)
+            {
+                Vector3 spawnPos = LevelBuilder.Instance.GetCellWorldPosition(currentEnemyTile.Position);
+                GameObject chestObj = Instantiate(chestPrefab, spawnPos, Quaternion.identity);
+
+                Chest chest = chestObj.GetComponent<Chest>();
+                if (chest != null)
+                {
+                    chest.InitChest(currentEnemyTile, generatedLoot);
+                }
+            }
         }
 
         if (currentEnemy != null)
@@ -271,5 +323,6 @@ public class CombatManager : MonoBehaviour
 
         currentEnemy = null;
         currentEnemyTile = null;
+        currentEnemyData = null;
     }
 }

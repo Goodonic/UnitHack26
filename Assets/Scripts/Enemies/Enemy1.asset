@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3c805cbda390344a9d186ed29319233, type: 3}
+  m_Name: Enemy1
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyData
+  enemyID: 666
+  enemyName: Demon
+  visualPrefab: {fileID: 919132149155446097, guid: c8a893d0c62579047abf1b45cc656338, type: 3}
+  maxHp: 30
+  possibleActions:
+  - actionName: "\u0411\u043B\u043E\u043A"
+    type: 1
+    value: 20
+    priority: 50
+    cooldownTurns: 0
+    maxUsesPerCombat: 0
+  - actionName: "\u0410\u0442\u0430\u043A\u0430"
+    type: 0
+    value: 10
+    priority: 50
+    cooldownTurns: 1
+    maxUsesPerCombat: 0
+  - actionName: Heal
+    type: 2
+    value: 20
+    priority: 20
+    cooldownTurns: 2
+    maxUsesPerCombat: 4
+  - actionName: "\u0421\u0438\u043B\u044C\u043D\u0430\u044F \u0430\u0442\u0430\u043A\u0430"
+    type: 0
+    value: 30
+    priority: 20
+    cooldownTurns: 4
+    maxUsesPerCombat: 2
+  minDrops: 1
+  maxDrops: 4
+  lootTable:
+  - item: {fileID: 11400000, guid: 4193b5eed5c03764d86c503445c81d69, type: 2}
+    dropChance: 85.9
+  - item: {fileID: 11400000, guid: b9204a5ad0212d14ca68b11ac068ec1f, type: 2}
+    dropChance: 40

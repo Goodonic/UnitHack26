@@ -5,6 +5,10 @@ public class InventorySlotUI : MonoBehaviour, IDropHandler
 {
     [Tooltip("Порядковый номер этой ячейки в инвентаре (от 0 до 149)")]
     public int slotIndex;
+
+    [HideInInspector] public Inventory associatedInventory;
+    [HideInInspector] public InventoryUI ownerUI;
+    [HideInInspector] public ChestUI ownerChestUI;
     public void OnDrop(PointerEventData eventData)
     {
         Debug.Log($"На ячейку {slotIndex} что-то бросили!");

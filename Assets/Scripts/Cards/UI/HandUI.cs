@@ -26,13 +26,19 @@ public class HandUI : MonoBehaviour
     public void DrawHand()
     {
         Debug.Log("DRAW HAND START");
-        Debug.Log("Panel: " + handPanel);
-        Debug.Log("Prefab: " + cardPrefab);
-        Debug.Log("Deck size: " + startingDeck.Count);
-
         ClearHand();
 
-        foreach (var cardData in startingDeck)
+        // 1. Создаем временную колоду для текущего боя на основе стартовой
+        List<CardData> combatDeck = new List<CardData>(startingDeck);
+
+        // 2. Добавляем в неё карты от надетого снаряжения
+        if (EquipmentManager.Instance != null)
+        {
+            combatDeck.AddRange(EquipmentManager.Instance.GetEquipmentCards());
+        }
+
+        // 3. Спавним карты из получившейся объединенной колоды
+        foreach (var cardData in combatDeck)
         {
             if (cardData == null)
             {
@@ -41,7 +47,6 @@ public class HandUI : MonoBehaviour
             }
 
             CardInstance instance = new CardInstance(cardData);
-
             GameObject cardObj = Instantiate(cardPrefab, handPanel);
 
             CardView view = cardObj.GetComponent<CardView>();
