@@ -25,8 +25,8 @@ RenderSettings:
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
   m_AmbientMode: 0
-  m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SubtractiveShadowColor: {r: 0.17221431, g: 0.20357409, b: 0.2830189, a: 1}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 20fca97cf5b8e92459331b3cd74c4be1, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -606,6 +606,63 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 623522103}
   m_CullTransparentMesh: 1
+--- !u!1001 &652938934
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 880a50c8d2488554b81d1e0aa2c34e98, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1773.7146
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 880a50c8d2488554b81d1e0aa2c34e98, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1229.0846
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 880a50c8d2488554b81d1e0aa2c34e98, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 987.6393
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 880a50c8d2488554b81d1e0aa2c34e98, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 880a50c8d2488554b81d1e0aa2c34e98, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 880a50c8d2488554b81d1e0aa2c34e98, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 880a50c8d2488554b81d1e0aa2c34e98, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 880a50c8d2488554b81d1e0aa2c34e98, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 880a50c8d2488554b81d1e0aa2c34e98, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 880a50c8d2488554b81d1e0aa2c34e98, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 880a50c8d2488554b81d1e0aa2c34e98, type: 3}
+      propertyPath: m_Name
+      value: synthboyAdvanced
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 880a50c8d2488554b81d1e0aa2c34e98, type: 3}
 --- !u!1 &994291309
 GameObject:
   m_ObjectHideFlags: 0
@@ -1697,3 +1754,4 @@ SceneRoots:
   - {fileID: 1151150001}
   - {fileID: 994291312}
   - {fileID: 1592378052}
+  - {fileID: 652938934}
