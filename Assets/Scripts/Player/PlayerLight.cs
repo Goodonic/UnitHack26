@@ -22,10 +22,10 @@ public class PlayerLight : MonoBehaviour
 
         playerLightComponent.shadows = LightShadows.Soft;
         playerLightComponent.bounceIntensity = 0;
-        playerLightComponent.color = new Color(255,0,255, 255);
+        playerLightComponent.color = new Color(1f,0,1f, 1f);
         playerLightComponent.intensity = lightIntensity;
         playerLightComponent.range = lightRange;
-
+        
         UpdateLightPosition();
     }
 
