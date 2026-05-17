@@ -13,7 +13,11 @@ public class LevelBuilder : MonoBehaviour
     [Header("Prefabs")]
     [SerializeField] private GameObject floorPrefab;
     [SerializeField] private GameObject wallPrefab;
-    
+
+    [Header("Enemy Visuals")]
+    [SerializeField] private float enemyHeightOffset = 0.0f;
+    [SerializeField] private float enemyScale = 0.6f;
+    [SerializeField] private Vector3 enemyRotation = Vector3.zero;
     [Header("Materials")]
     [SerializeField] private Material stoneMaterial;
     [SerializeField] private Material dirtMaterial;
@@ -65,6 +69,7 @@ public class LevelBuilder : MonoBehaviour
 
                 BuildFloor(tile, worldPos, currentLevel.transform);
                 BuildWalls(tile, worldPos, currentLevel.transform);
+                BuildEnemyVisual(tile, worldPos, currentLevel.transform);
             }
         }
     }
@@ -106,7 +111,41 @@ public class LevelBuilder : MonoBehaviour
             renderer.material.color = Color.red;
         }
     }
-    
+
+    private void BuildEnemyVisual(Tile tile, Vector3 position, Transform parent)
+    {
+        tile.EnemyVisualOnTile = null;
+
+        if (!tile.HasEnemy)
+        {
+            return;
+        }
+
+        if (tile.EnemyDataOnTile == null)
+        {
+            return;
+        }
+
+        if (tile.EnemyDataOnTile.visualPrefab == null)
+        {
+            Debug.LogWarning($"Enemy '{tile.EnemyDataOnTile.enemyName}' has no visual prefab.");
+            return;
+        }
+
+        Vector3 spawnPosition = position + Vector3.up * enemyHeightOffset;
+        Quaternion spawnRotation = Quaternion.Euler(enemyRotation);
+
+        GameObject enemyVisual = Instantiate(
+            tile.EnemyDataOnTile.visualPrefab,
+            spawnPosition,
+            spawnRotation,
+            parent);
+
+        enemyVisual.name = $"Enemy_{tile.EnemyDataOnTile.enemyName}_{tile.Position.x}_{tile.Position.y}";
+        enemyVisual.transform.localScale = Vector3.one * enemyScale;
+
+        tile.EnemyVisualOnTile = enemyVisual;
+    }
     private void BuildWalls(Tile tile, Vector3 position, Transform parent)
     {
         float wallHeight = WALL_HEIGHT;

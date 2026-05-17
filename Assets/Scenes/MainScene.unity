@@ -591,6 +591,9 @@ MonoBehaviour:
   WALL_HEIGHT: 3
   floorPrefab: {fileID: 7803971899212018742, guid: 968f8848a5757e84da36bc1a97531bce, type: 3}
   wallPrefab: {fileID: 4296125577507711886, guid: 6dfa440af5d18744c9a0debaf2f59f08, type: 3}
+  enemyHeightOffset: 0
+  enemyScale: 0.6
+  enemyRotation: {x: 0, y: 180, z: 0}
   stoneMaterial: {fileID: 0}
   dirtMaterial: {fileID: 0}
   waterMaterial: {fileID: 0}
@@ -2115,7 +2118,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: [{fileID: 245093172}]
+  m_Children:
+  - {fileID: 245093172}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1807903052
