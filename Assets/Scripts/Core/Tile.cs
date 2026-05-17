@@ -11,6 +11,7 @@ public class Tile
     public bool IsExit;
 
     public EnemyData EnemyDataOnTile;
+    public GameObject EnemyVisualOnTile;
 
     public bool HasEnemy => EnemyDataOnTile != null;
 
@@ -22,6 +23,7 @@ public class Tile
         IsStart = false;
         IsExit = false;
         EnemyDataOnTile = null;
+        EnemyVisualOnTile = null;
     }
 
     public bool HasWall(Direction direction)

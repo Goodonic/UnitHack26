@@ -41,17 +41,23 @@ public class PlayerController : MonoBehaviour
         inputActions.Player.Enable();
         
         // Subscribe to input events
-        inputActions.Player.MoveForward.performed += ctx => TryMoveForward();
         inputActions.Player.MoveBackward.performed += ctx => TryMoveBackward();
         inputActions.Player.RotateLeft.performed += ctx => RotateLeft();
         inputActions.Player.RotateRight.performed += ctx => RotateRight();
+    }
+    
+    void Update()
+    {
+        if (inputActions != null && inputActions.Player.MoveForward.IsPressed())
+        {
+            TryMoveForward();
+        }
     }
     
     void OnDestroy()
     {
         if (inputActions != null)
         {
-            inputActions.Player.MoveForward.performed -= ctx => TryMoveForward();
             inputActions.Player.MoveBackward.performed -= ctx => TryMoveBackward();
             inputActions.Player.RotateLeft.performed -= ctx => RotateLeft();
             inputActions.Player.RotateRight.performed -= ctx => RotateRight();
@@ -260,6 +266,28 @@ public class PlayerController : MonoBehaviour
         else
         {
             Debug.Log("All floors completed!");
+            StartBossCombat(currentTile);
         }
+    }
+
+    private void StartBossCombat(Tile bossTile)
+    {
+        if (CombatManager.Instance == null)
+        {
+            Debug.LogWarning("Combat manager not found. Boss combat cannot start.");
+            return;
+        }
+
+        EnemyData bossEnemy = dungeonGenerator.BossEnemy;
+
+        if (bossEnemy == null)
+        {
+            Debug.LogWarning("Boss enemy is not assigned in DungeonGenerator.");
+            return;
+        }
+
+        Debug.Log("All floors completed! Boss combat started.");
+
+        CombatManager.Instance.StartCombat(bossTile, bossEnemy);
     }
 }

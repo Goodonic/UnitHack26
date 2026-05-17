@@ -150,8 +150,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelBuilder
   CELL_SIZE: 3
   WALL_HEIGHT: 3
+<<<<<<< HEAD
+  floorPrefab: {fileID: 7803971899212018742, guid: 3ad025ddef133524f9511bb33b85a05a, type: 3}
+  wallPrefab: {fileID: 4296125577507711886, guid: 71f7f1a9de49c9241ba7bf9c7332f6f6, type: 3}
+=======
   floorPrefab: {fileID: 7803971899212018742, guid: 968f8848a5757e84da36bc1a97531bce, type: 3}
   wallPrefab: {fileID: 4296125577507711886, guid: 6dfa440af5d18744c9a0debaf2f59f08, type: 3}
+>>>>>>> deck
   stoneMaterial: {fileID: 2100000, guid: 373802d3079aba84ebf65b775d4b9a4b, type: 2}
   dirtMaterial: {fileID: 2100000, guid: 373802d3079aba84ebf65b775d4b9a4b, type: 2}
   waterMaterial: {fileID: 2100000, guid: 373802d3079aba84ebf65b775d4b9a4b, type: 2}
@@ -210,10 +215,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Generation.DangeonGenerator
   width: 35
   height: 35
+<<<<<<< HEAD
+  maxFloors: 3
+=======
   enemyCount: 35
   startPosition: {x: 1, y: 1}
   maxFloors: 3
   possibleEnemies: []
+>>>>>>> deck
   minLeafSize: 8
   maxLeafSize: 16
   minRoomSize: 4
@@ -410,7 +419,12 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
+<<<<<<< HEAD
+  m_Children:
+  - {fileID: 1971090182}
+=======
   m_Children: []
+>>>>>>> deck
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -418,6 +432,66 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+<<<<<<< HEAD
+--- !u!1001 &1535705514
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 54825895008790880, guid: ca084a5dbeaf98f41aef20582159e5fb, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 8.68
+      objectReference: {fileID: 0}
+    - target: {fileID: 54825895008790880, guid: ca084a5dbeaf98f41aef20582159e5fb, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 8.34
+      objectReference: {fileID: 0}
+    - target: {fileID: 54825895008790880, guid: ca084a5dbeaf98f41aef20582159e5fb, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 54825895008790880, guid: ca084a5dbeaf98f41aef20582159e5fb, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 54825895008790880, guid: ca084a5dbeaf98f41aef20582159e5fb, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 54825895008790880, guid: ca084a5dbeaf98f41aef20582159e5fb, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 54825895008790880, guid: ca084a5dbeaf98f41aef20582159e5fb, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 54825895008790880, guid: ca084a5dbeaf98f41aef20582159e5fb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 54825895008790880, guid: ca084a5dbeaf98f41aef20582159e5fb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 54825895008790880, guid: ca084a5dbeaf98f41aef20582159e5fb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5028632470492801785, guid: ca084a5dbeaf98f41aef20582159e5fb, type: 3}
+      propertyPath: m_Name
+      value: potolok (2)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: ca084a5dbeaf98f41aef20582159e5fb, type: 3}
+=======
+>>>>>>> deck
 --- !u!1 &1616673345
 GameObject:
   m_ObjectHideFlags: 0
@@ -538,6 +612,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c879548a532944178f92acad33617ebb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerLight
+<<<<<<< HEAD
+  lightIntensity: 189
+  lightRange: 9
+=======
+>>>>>>> deck
 --- !u!82 &1807903053
 AudioSource:
   m_ObjectHideFlags: 0
@@ -643,6 +722,103 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1807903048}
   m_Enabled: 1
+<<<<<<< HEAD
+--- !u!1 &1971090181
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1971090182}
+  - component: {fileID: 1971090185}
+  - component: {fileID: 1971090184}
+  - component: {fileID: 1971090183}
+  m_Layer: 5
+  m_Name: RawImage
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1971090182
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1971090181}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 915067385}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -430, y: -185}
+  m_SizeDelta: {x: 200, y: 200}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1971090183
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1971090181}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 988eb0b426604eb29438ee7ade4dc056, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UI.MinimapRenderer
+  minimapImage: {fileID: 1971090184}
+  wallColor: {r: 0.02, g: 0.02, b: 0.02, a: 1}
+  stoneColor: {r: 0.45, g: 0.45, b: 0.45, a: 1}
+  dirtColor: {r: 0.45, g: 0.28, b: 0.12, a: 1}
+  waterColor: {r: 0.05, g: 0.2, b: 0.8, a: 1}
+  startColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  exitColor: {r: 0, g: 1, b: 0, a: 1}
+  playerColor: {r: 1, g: 0, b: 0, a: 1}
+  filterMode: 0
+--- !u!114 &1971090184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1971090181}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RawImage
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Texture: {fileID: 0}
+  m_UVRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+--- !u!222 &1971090185
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1971090181}
+  m_CullTransparentMesh: 1
+=======
+>>>>>>> deck
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -653,3 +829,7 @@ SceneRoots:
   - {fileID: 1807903051}
   - {fileID: 915067385}
   - {fileID: 891858717}
+<<<<<<< HEAD
+  - {fileID: 1535705514}
+=======
+>>>>>>> deck

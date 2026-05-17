@@ -33,6 +33,7 @@ public class CombatManager : MonoBehaviour
     private int currentStamina;
 
     private Enemy currentEnemy;
+    private Tile currentEnemyTile;
 
     public System.Action<CardInstance> OnCardUsed;
 
@@ -88,6 +89,14 @@ public class CombatManager : MonoBehaviour
         isCombatActive = true;
         player.SetCombatState(true);
         SetCombatUI(true);
+
+        currentEnemyTile = enemyTile;
+
+        if (currentEnemyTile.EnemyVisualOnTile != null)
+        {
+            Destroy(currentEnemyTile.EnemyVisualOnTile);
+            currentEnemyTile.EnemyVisualOnTile = null;
+        }
 
         currentStamina = maxStamina;
         UpdateStaminaUI();
@@ -254,6 +263,13 @@ public class CombatManager : MonoBehaviour
         if (currentEnemy != null)
             Destroy(currentEnemy.gameObject);
 
+        if (playerWon && currentEnemyTile != null)
+        {
+            currentEnemyTile.EnemyDataOnTile = null;
+            currentEnemyTile.EnemyVisualOnTile = null;
+        }
+
         currentEnemy = null;
+        currentEnemyTile = null;
     }
 }

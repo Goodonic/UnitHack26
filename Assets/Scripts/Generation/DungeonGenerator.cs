@@ -23,7 +23,12 @@ namespace Generation
 
         [Header("Enemies")]
         [SerializeField] private List<EnemyData> possibleEnemies;
-
+        
+        [Header("Boss")]
+        [SerializeField] private EnemyData bossEnemy;
+        
+        public EnemyData BossEnemy => bossEnemy;
+        
         [Header("BSP Settings")]
         [SerializeField] private int minLeafSize = 8;
         [SerializeField] private int maxLeafSize = 16;
@@ -95,17 +100,15 @@ namespace Generation
 
             List<Tile> candidates = new List<Tile>();
 
-            for (int x = 0; x < width; x++)
+            foreach (Vector2Int position in floorPositions)
             {
-                for (int y = 0; y < height; y++)
-                {
-                    Tile tile = gridManager.GetTile(x, y);
+                Tile tile = gridManager.GetTile(position);
 
-                    if (tile == null) continue;
-                    if (tile.IsStart || tile.IsExit) continue;
+                if (tile == null) continue;
+                if (tile.IsStart || tile.IsExit) continue;
+                if (tile.HasEnemy) continue;
 
-                    candidates.Add(tile);
-                }
+                candidates.Add(tile);
             }
 
             for (int i = 0; i < enemyCount; i++)
